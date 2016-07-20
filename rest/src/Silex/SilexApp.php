@@ -55,9 +55,9 @@ class SilexApp
 			'db.options' => array(
 				'driver' => 'pdo_mysql',
 				'host' => 'localhost',
-				'dbname' => 'pgl',
-				'user' => 'root',
-				'password' => 'root',
+				'dbname' => 'pokemon',
+				'user' => 'pok',
+				'password' => 'pikapikachu',
 				'charset' => 'utf8',
 			),
 		));
