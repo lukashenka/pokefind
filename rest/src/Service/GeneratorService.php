@@ -18,7 +18,7 @@ class GeneratorService
 
 	public function addGeneratorTask($lat, $lng)
 	{
-		$sql = "INSERT INTO location_for_update(lat,lng,created) VALUES ({$lat}, {$lng}, NOW())";
+		$sql = "INSERT IGNORE INTO location_for_update(lat,lng,created) VALUES ({$lat}, {$lng}, NOW())";
 		$app = SilexApp::getApp();
 		$db = $app['db'];
 		$db->exec($sql);
