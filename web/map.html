@@ -42,11 +42,11 @@
                 };
 
 
-                $.getJSON("http://localhost/rs/pgoweb/rest/pokemon/list/" + pos.lat + "/" + pos.lng + "", function (json) {
+                $.getJSON("../rest/pokemon/list/" + pos.lat + "/" + pos.lng + "", function (json) {
                     $.each(json, function (key, data) {
                         var latLng = new google.maps.LatLng(data.lat, data.lng);
                         // Creating a marker and putting it on the map
-                        var image = "http://localhost/rs/pgoweb/web/assets/larger-icons/"+data.pokeuid + ".png";
+                        var image = "assets/larger-icons/"+data.pokeuid + ".png";
                         var marker = new google.maps.Marker({
                             position: latLng,
                             map: map,
