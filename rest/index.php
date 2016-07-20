@@ -8,10 +8,18 @@ $app = \Rest\Silex\SilexApp::getApp();
 $app['debug'] = true;
 
 
-$app->get('/hello/{name}', function ($name) use ($app) {
-	return 'Hello '.$app->escape($name);
+$app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
+
+	$service = $app['pokemonLocation'];
+	$pokemons = $service->getNear($lat, $lng, 1000);
+	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
 
+$app->get('clearExpired' ,function() use ($app) {
+	$sevice = $app['clearService'];
+	$sevice->expired();
+	return "OK";
+});
 $app->finish(function (Request $request, Response $response) use ($app) {
 //	$logger = $app["apiDBLogger"];
 //	$logger->write(

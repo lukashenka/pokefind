@@ -2,12 +2,16 @@
 
 namespace Rest\Silex;
 
-use GuzzleHttp\Handler\StreamHandler;
+use Monolog\Handler\StreamHandler;
+use Rest\Service\ClearService;
+use Rest\Service\GeneratorService;
+use Rest\Service\PokemonLocation;
 use Silex\Application;
 use Silex\Provider\MonologServiceProvider;
 use Rest\Service\APIDBLogger;
 use Sorien\Provider\PimpleDumpProvider;
 use Symfony\Component\Debug\ErrorHandler;
+use Silex\Provider\DoctrineServiceProvider;
 
 class SilexApp
 {
@@ -44,13 +48,24 @@ class SilexApp
 		$app->register(new PimpleDumpProvider());
 
 		$app->register(new MonologServiceProvider(), array(
-			'monolog.logfile' => $app['log_folder']. '/silex/silex-' . date("Ymd") . '.log',
+			'monolog.logfile' => $app['log_folder'] . '/silex/silex-' . date("Ymd") . '.log',
+		));
+
+		$app->register(new DoctrineServiceProvider(), array(
+			'db.options' => array(
+				'driver' => 'pdo_mysql',
+				'host' => 'localhost',
+				'dbname' => 'pgl',
+				'user' => 'root',
+				'password' => 'root',
+				'charset' => 'utf8',
+			),
 		));
 
 		$app['monolog.silex_api'] = function ($app) {
 			$date = date("Ymd");
 			$log = new $app['monolog.logger.class']('silex_api');
-			$handler = new StreamHandler($app['log_folder']."/rest-{$date}.log", \Monolog\Logger::DEBUG);
+			$handler = new StreamHandler($app['log_folder'] . "/rest-{$date}.log", \Monolog\Logger::DEBUG);
 			$log->pushHandler($handler);
 			return $log;
 		};
@@ -58,6 +73,15 @@ class SilexApp
 
 		$app['apiDBLogger'] = function () {
 			return new APIDBLogger();
+		};
+		$app['pokemonLocation'] = function () {
+			return new PokemonLocation();
+		};
+		$app['clearService'] = function () {
+			return new ClearService();
+		};
+		$app['generator'] = function () {
+			return new GeneratorService();
 		};
 		ErrorHandler::register();
 		return $app;

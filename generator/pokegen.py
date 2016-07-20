@@ -39,9 +39,10 @@ LOGIN_URL = \
     'https://sso.pokemon.com/sso/login?service=https://sso.pokemon.com/sso/oauth2.0/callbackAuthorize'
 LOGIN_OAUTH = 'https://sso.pokemon.com/sso/oauth2.0/accessToken'
 APP = 'com.nianticlabs.pokemongo'
-
-with open('credentials.json') as file:
-	credentials = json.load(file)
+full_path = os.path.realpath(__file__)
+(path, filename) = os.path.split(full_path)
+with open(path + '/credentials.json') as file:
+    credentials = json.load(file)
 
 PTC_CLIENT_SECRET = credentials.get('ptc_client_secret', None)
 ANDROID_ID = credentials.get('android_id', None)
@@ -57,7 +58,7 @@ global_password = None
 global_token = None
 access_token = None
 DEBUG = True
-VERBOSE_DEBUG = True  # if you want to write raw request/response to the console
+VERBOSE_DEBUG = False  # if you want to write raw request/response to the console
 COORDS_LATITUDE = 0
 COORDS_LONGITUDE = 0
 COORDS_ALTITUDE = 0
@@ -71,7 +72,8 @@ api_endpoint = None
 pokemons = {}
 gyms = {}
 pokestops = {}
-numbertoteam = {  # At least I'm pretty sure that's it. I could be wrong and then I'd be displaying the wrong owner team of gyms.
+numbertoteam = {
+# At least I'm pretty sure that's it. I could be wrong and then I'd be displaying the wrong owner team of gyms.
     0: 'Gym',
     1: 'Mystic',
     2: 'Valor',
@@ -84,6 +86,7 @@ is_ampm_clock = False
 
 search_thread = None
 
+
 def memoize(obj):
     cache = obj.cache = {}
 
@@ -93,7 +96,9 @@ def memoize(obj):
         if key not in cache:
             cache[key] = obj(*args, **kwargs)
         return cache[key]
+
     return memoizer
+
 
 def parse_unicode(bytestring):
     decoded_string = bytestring.decode(sys.getfilesystemencoding())
@@ -162,7 +167,6 @@ def retrying_set_location(location_name):
             debug(
                 'retrying_set_location: geocoder exception ({}), retrying'.format(
                     str(e)))
-        time.sleep(1.25)
 
 
 def set_location(location_name):
@@ -209,7 +213,6 @@ def retrying_api_req(service, api_endpoint, access_token, *args, **kwargs):
         except (InvalidURL, ConnectionError, DecodeError), e:
             debug('retrying_api_req: request error ({}), retrying'.format(
                 str(e)))
-        time.sleep(1)
 
 
 def api_req(service, api_endpoint, access_token, *args, **kwargs):
@@ -250,7 +253,7 @@ def api_req(service, api_endpoint, access_token, *args, **kwargs):
         print '''
 
 '''
-    time.sleep(0.51)
+
     return p_ret
 
 
@@ -261,7 +264,7 @@ def get_api_endpoint(service, access_token, api=API_URL):
                                                 None)
         if not hasattr(profile_response, 'api_url'):
             debug(
-                'retrying_get_profile: get_profile returned no api_url, retrying')
+                'retrying_get_profile: get_profile returned no aspi_url, retrying')
             profile_response = None
             continue
         if not len(profile_response.api_url):
@@ -270,6 +273,7 @@ def get_api_endpoint(service, access_token, api=API_URL):
             profile_response = None
 
     return 'https://%s/rpc' % profile_response.api_url
+
 
 def retrying_get_profile(service, access_token, api, useauth, *reqq):
     profile_response = None
@@ -287,6 +291,7 @@ def retrying_get_profile(service, access_token, api, useauth, *reqq):
             profile_response = None
 
     return profile_response
+
 
 def get_profile(service, access_token, api, useauth, *reqq):
     req = pokemon_pb2.RequestEnvelop()
@@ -316,6 +321,7 @@ def get_profile(service, access_token, api, useauth, *reqq):
         req5.MergeFrom(reqq[4])
     return retrying_api_req(service, api, access_token, req, useauth=useauth)
 
+
 def login_google(username, password):
     print '[!] Google login for: {}'.format(username)
     r1 = perform_master_login(username, password, ANDROID_ID)
@@ -326,6 +332,7 @@ def login_google(username, password):
                        APP,
                        CLIENT_SIG, )
     return r2.get('Auth')
+
 
 def login_ptc(username, password):
     print '[!] PTC login for: {}'.format(username)
@@ -418,6 +425,7 @@ def get_heartbeat(service,
     heartbeat.ParseFromString(payload)
     return heartbeat
 
+
 def get_token(service, username, password):
     """
     Get token if it's not None
@@ -494,24 +502,25 @@ def get_args():
         help='Coordinates transformer for China',
         action='store_true')
     parser.add_argument(
-    	"-pm",
-    	"--ampm_clock",
-    	help="Toggles the AM/PM clock for Pokemon timers",
-    	action='store_true',
-    	default=False)
+        "-pm",
+        "--ampm_clock",
+        help="Toggles the AM/PM clock for Pokemon timers",
+        action='store_true',
+        default=False)
     parser.add_argument(
         '-d', '--debug', help='Debug Mode', action='store_true')
     parser.set_defaults(DEBUG=True)
     return parser.parse_args()
 
+
 @memoize
 def login(args):
     global global_password
     if not global_password:
-      if args.password:
-        global_password = args.password
-      else:
-        global_password = getpass.getpass()
+        if args.password:
+            global_password = args.password
+        else:
+            global_password = getpass.getpass()
 
     access_token = get_token(args.auth_service, args.username, global_password)
     if access_token is None:
@@ -548,6 +557,7 @@ def login(args):
 
     return api_endpoint, access_token, profile_response
 
+
 def main():
     full_path = os.path.realpath(__file__)
     (path, filename) = os.path.split(full_path)
@@ -569,20 +579,18 @@ def main():
 
     # only get location for first run
     if not (FLOAT_LAT and FLOAT_LONG):
-      print('[+] Getting initial location')
-      retrying_set_location(args.location)
+        print('[+] Getting inгнрьitial location')
+        retrying_set_location(args.location)
 
     if args.auto_refresh:
         global auto_refresh
         auto_refresh = int(args.auto_refresh) * 1000
 
     if args.ampm_clock:
-    	global is_ampm_clock
-    	is_ampm_clock = True
+        global is_ampm_clock
+        is_ampm_clock = True
 
     api_endpoint, access_token, profile_response = login(args)
-
-    clear_stale_pokemons()
 
     steplimit = int(args.step_limit)
 
@@ -598,11 +606,11 @@ def main():
     y = 0
     dx = 0
     dy = -1
-    steplimit2 = steplimit**2
+    steplimit2 = steplimit ** 2
     for step in range(steplimit2):
-        #starting at 0 index
-        debug('looping: step {} of {}'.format((step+1), steplimit**2))
-        #debug('steplimit: {} x: {} y: {} pos: {} dx: {} dy {}'.format(steplimit2, x, y, pos, dx, dy))
+        # starting at 0 index
+        debug('looping: step {} of {}'.format((step + 1), steplimit ** 2))
+        # debug('steplimit: {} x: {} y: {} pos: {} dx: {} dy {}'.format(steplimit2, x, y, pos, dx, dy))
         # Scan location math
         if -steplimit2 / 2 < x <= steplimit2 / 2 and -steplimit2 / 2 < y <= steplimit2 / 2:
             set_location_coords(x * 0.0025 + origin_lat, y * 0.0025 + origin_lon, 0)
@@ -615,7 +623,7 @@ def main():
                      pokemonsJSON, ignore, only)
 
         print('Completed: ' + str(
-            ((step+1) + pos * .25 - .25) / (steplimit2) * 100) + '%')
+            ((step + 1) + pos * .25 - .25) / (steplimit2) * 100) + '%')
 
     global NEXT_LAT, NEXT_LONG
     if (NEXT_LAT and NEXT_LONG and
@@ -657,7 +665,7 @@ def process_step(args, api_endpoint, access_token, profile_response,
             for cell in hh.cells:
                 for wild in cell.WildPokemon:
                     hash = wild.SpawnPointId + ':' \
-                        + str(wild.pokemon.PokemonId)
+                           + str(wild.pokemon.PokemonId)
                     if hash not in seen:
                         visible.append(wild)
                         seen.add(hash)
@@ -666,17 +674,17 @@ def process_step(args, api_endpoint, access_token, profile_response,
                         if Fort.Enabled == True:
                             if args.china:
                                 (Fort.Latitude, Fort.Longitude) = \
-transform_from_wgs_to_gcj(Location(Fort.Latitude, Fort.Longitude))
+                                    transform_from_wgs_to_gcj(Location(Fort.Latitude, Fort.Longitude))
                             if Fort.GymPoints and args.display_gym:
                                 gyms[Fort.FortId] = [Fort.Team, Fort.Latitude,
                                                      Fort.Longitude, Fort.GymPoints]
 
                             elif Fort.FortType \
-                                and args.display_pokestop:
+                                    and args.display_pokestop:
                                 expire_time = 0
                                 if Fort.LureInfo.LureExpiresTimestampMs:
-                                    expire_time = datetime\
-                                        .fromtimestamp(Fort.LureInfo.LureExpiresTimestampMs / 1000.0)\
+                                    expire_time = datetime \
+                                        .fromtimestamp(Fort.LureInfo.LureExpiresTimestampMs / 1000.0) \
                                         .strftime("%H:%M:%S")
                                 if (expire_time != 0 or not args.onlylure):
                                     pokestops[Fort.FortId] = [Fort.Latitude,
@@ -694,12 +702,12 @@ transform_from_wgs_to_gcj(Location(Fort.Latitude, Fort.Longitude))
                 continue
 
         disappear_timestamp = time.time() + poke.TimeTillHiddenMs \
-            / 1000
+                                            / 1000
 
         if args.china:
             (poke.Latitude, poke.Longitude) = \
                 transform_from_wgs_to_gcj(Location(poke.Latitude,
-                    poke.Longitude))
+                                                   poke.Longitude))
 
         pokemons[poke.SpawnPointId] = {
             "lat": poke.Latitude,
@@ -711,16 +719,6 @@ transform_from_wgs_to_gcj(Location(Fort.Latitude, Fort.Longitude))
         }
         id = get_pokemon(pokename, poke.pokemon.PokemonId)
         insert_pokelocation(id, poke.Longitude, poke.Latitude, disappear_timestamp)
-
-def clear_stale_pokemons():
-    current_time = time.time()
-
-    for pokemon_key in pokemons.keys():
-        pokemon = pokemons[pokemon_key]
-        if current_time > pokemon['disappear_time']:
-            print "[+] removing stale pokemon %s at %f, %f from list" % (
-                pokemon['name'].encode('utf-8'), pokemon['lat'], pokemon['lng'])
-            del pokemons[pokemon_key]
 
 
 def register_background_thread(initial_registration=False):
@@ -756,159 +754,7 @@ def register_background_thread(initial_registration=False):
     search_thread.start()
 
 
-def create_app():
-    app = Flask(__name__, template_folder='templates')
-
-    GoogleMaps(app, key=GOOGLEMAPS_KEY)
-    return app
-
-
-app = create_app()
-
-
-@app.route('/data')
-def data():
-    """ Gets all the PokeMarkers via REST """
-    return json.dumps(get_pokemarkers())
-
-@app.route('/raw_data')
-def raw_data():
-    """ Gets raw data for pokemons/gyms/pokestops via REST """
-    return flask.jsonify(pokemons=pokemons, gyms=gyms, pokestops=pokestops)
-
-
-@app.route('/config')
-def config():
-    """ Gets the settings for the Google Maps via REST"""
-    center = {
-        'lat': FLOAT_LAT,
-        'lng': FLOAT_LONG,
-        'zoom': 15,
-        'identifier': "fullmap"
-    }
-    return json.dumps(center)
-
-
-@app.route('/')
-def fullmap():
-    clear_stale_pokemons()
-
-    return render_template(
-        'example_fullmap.html', key=GOOGLEMAPS_KEY, fullmap=get_map(), auto_refresh=auto_refresh)
-
-
-@app.route('/next_loc')
-def next_loc():
-    global NEXT_LAT, NEXT_LONG
-
-    lat = flask.request.args.get('lat', '')
-    lon = flask.request.args.get('lon', '')
-    if not (lat and lon):
-        print('[-] Invalid next location: %s,%s' % (lat, lon))
-    else:
-        print('[+] Saved next location as %s,%s' % (lat, lon))
-        NEXT_LAT = float(lat)
-        NEXT_LONG = float(lon)
-        return 'ok'
-
-
-def get_pokemarkers():
-    pokeMarkers = [{
-        'icon': icons.dots.red,
-        'lat': origin_lat,
-        'lng': origin_lon,
-        'infobox': "Start position",
-        'type': 'custom',
-        'key': 'start-position',
-        'disappear_time': -1
-    }]
-
-    for pokemon_key in pokemons:
-        pokemon = pokemons[pokemon_key]
-        datestr = datetime.fromtimestamp(pokemon[
-            'disappear_time'])
-        dateoutput = datestr.strftime("%H:%M:%S")
-        if is_ampm_clock:
-        	dateoutput = datestr.strftime("%I:%M%p").lstrip('0')
-        pokemon['disappear_time_formatted'] = dateoutput
-
-        LABEL_TMPL = u'''
-<div><b>{name}</b><span> - </span><small><a href='http://www.pokemon.com/us/pokedex/{id}' target='_blank' title='View in Pokedex'>#{id}</a></small></div>
-<div>Disappears at - {disappear_time_formatted} <span class='label-countdown' disappears-at='{disappear_time}'></span></div>
-<div><a href='https://www.google.com/maps/dir/Current+Location/{lat},{lng}' target='_blank' title='View in Maps'>Get Directions</a></div>
-'''
-        label = LABEL_TMPL.format(**pokemon)
-        #  NOTE: `infobox` field doesn't render multiple line string in frontend
-        label = label.replace('\n', '')
-
-        pokeMarkers.append({
-            'type': 'pokemon',
-            'key': pokemon_key,
-            'disappear_time': pokemon['disappear_time'],
-            'icon': 'static/icons/%d.png' % pokemon["id"],
-            'lat': pokemon["lat"],
-            'lng': pokemon["lng"],
-            'infobox': label
-        })
-
-    for gym_key in gyms:
-        gym = gyms[gym_key]
-        if gym[0] == 0:
-            color = "rgba(0,0,0,.4)"
-        if gym[0] == 1:
-            color = "rgba(74, 138, 202, .6)"
-        if gym[0] == 2:
-            color = "rgba(240, 68, 58, .6)"
-        if gym[0] == 3:
-            color = "rgba(254, 217, 40, .6)"
-
-        icon = 'static/forts/'+numbertoteam[gym[0]]+'_large.png'
-        pokeMarkers.append({
-            'icon': 'static/forts/' + numbertoteam[gym[0]] + '.png',
-            'type': 'gym',
-            'key': gym_key,
-            'disappear_time': -1,
-            'lat': gym[1],
-            'lng': gym[2],
-            'infobox': "<div><center><small>Gym owned by:</small><br><b style='color:" + color + "'>Team " + numbertoteam[gym[0]] + "</b><br><img id='" + numbertoteam[gym[0]] + "' height='100px' src='"+icon+"'><br>Prestige: " + str(gym[3]) + "</center>"
-        })
-    for stop_key in pokestops:
-        stop = pokestops[stop_key]
-        if stop[2] > 0:
-            pokeMarkers.append({
-                'type': 'lured_stop',
-                'key': stop_key,
-                'disappear_time': -1,
-                'icon': 'static/forts/PstopLured.png',
-                'lat': stop[0],
-                'lng': stop[1],
-                'infobox': 'Lured Pokestop, expires at ' + stop[2],
-            })
-        else:
-            pokeMarkers.append({
-                'type': 'stop',
-                'key': stop_key,
-                'disappear_time': -1,
-                'icon': 'static/forts/Pstop.png',
-                'lat': stop[0],
-                'lng': stop[1],
-                'infobox': 'Pokestop',
-            })
-    return pokeMarkers
-
-
-def get_map():
-    fullmap = Map(
-        identifier="fullmap2",
-        style='height:100%;width:100%;top:0;left:0;position:absolute;z-index:200;',
-        lat=origin_lat,
-        lng=origin_lon,
-        markers=get_pokemarkers(),
-        zoom='15', )
-    return fullmap
-
-
 if __name__ == '__main__':
     args = get_args()
     register_background_thread(initial_registration=True)
-    app.run(debug=True, threaded=True, host=args.host, port=args.port)
+    main()

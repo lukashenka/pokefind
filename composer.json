@@ -1,0 +1,20 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Rest\\": "rest/src/"
+        }
+    },
+    "require": {
+        "silex/silex": "~2.0",
+        "silex/providers": "*",
+        "doctrine/dbal": "~2.2",
+        "guzzlehttp/guzzle": "*",
+        "monolog/monolog": "*",
+        "symfony/security": "*",
+        "symfony/debug": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*",
+        "sorien/silex-pimple-dumper": "*"
+    }
+}
