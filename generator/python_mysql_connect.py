@@ -125,6 +125,4 @@ def get_task():
     except Error as e:
         print(e)
 
-    finally:
-        cursor.close()
-        conn.close()
+
