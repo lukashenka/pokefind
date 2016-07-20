@@ -14,7 +14,13 @@ use Rest\Silex\SilexApp;
 class GeneratorService
 {
 
-	public function generatePoks($lat, $lng) {
-		system(SilexApp::getApp()['project_root']. "/../generator/pokegen.py -a google -u pokemongosukablia@gmail.com -p slowpoke -l \"{$lat}, {$lng}\" -st 10 ");
+	const MIN_POKEMONS_FOR_NEW_GENERATE = 7;
+
+	public function addGeneratorTask($lat, $lng)
+	{
+		$sql = "INSERT INTO location_for_update(lat,lng,created) VALUES ({$lat}, {$lng}, NOW())";
+		$app = SilexApp::getApp();
+		$db = $app['db'];
+		$db->exec($sql);
 	}
 }

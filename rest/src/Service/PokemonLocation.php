@@ -28,10 +28,14 @@ class PokemonLocation
 		FROM pokemon_location AS pl
 		LEFT JOIN pokemon AS p ON pl.pokemon_id = p.id
 		GROUP BY pokemon_id, lat, lng
-
+		HAVING distance < {$kilometers}
 		ORDER BY distance
 		";
 		$poks = $app['db']->fetchAll($sql);
+
+		if(count($poks) <= GeneratorService::MIN_POKEMONS_FOR_NEW_GENERATE) {
+			$app['generator']->addGeneratorTask($lat, $lng);
+		}
 
 		$pokList = [];
 		foreach($poks as $pok) {

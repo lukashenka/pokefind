@@ -152,21 +152,7 @@ def h2f(hex):
     return struct.unpack('<d', struct.pack('<Q', int(hex, 16)))[0]
 
 
-def retrying_set_location(location_name):
-    """
-    Continue trying to get co-ords from Google Location until we have them
-    :param location_name: string to pass to Location API
-    :return: None
-    """
 
-    while True:
-        try:
-            set_location(location_name)
-            return
-        except (GeocoderTimedOut, GeocoderServiceError), e:
-            debug(
-                'retrying_set_location: geocoder exception ({}), retrying'.format(
-                    str(e)))
 
 
 def set_location(location_name):
@@ -450,8 +436,6 @@ def get_args():
         '-a', '--auth_service', type=str.lower, help='Auth Service', default='ptc')
     parser.add_argument('-u', '--username', help='Username', required=True)
     parser.add_argument('-p', '--password', help='Password', required=False)
-    parser.add_argument(
-        '-l', '--location', type=parse_unicode, help='Location', required=True)
     parser.add_argument('-st', '--step-limit', help='Steps', required=True)
     group = parser.add_mutually_exclusive_group(required=False)
     group.add_argument(
@@ -559,6 +543,18 @@ def login(args):
 
 
 def main():
+
+    coords = get_task()
+
+    if(coords):
+        global origin_lat
+        global origin_lon
+        origin_lat = coords[0]
+        origin_lon = coords[1]
+    else:
+        print 'No tasks'
+        return False
+
     full_path = os.path.realpath(__file__)
     (path, filename) = os.path.split(full_path)
 
@@ -577,10 +573,6 @@ def main():
         DEBUG = True
         print '[!] DEBUG mode on'
 
-    # only get location for first run
-    if not (FLOAT_LAT and FLOAT_LONG):
-        print('[+] Getting inгнрьitial location')
-        retrying_set_location(args.location)
 
     if args.auto_refresh:
         global auto_refresh

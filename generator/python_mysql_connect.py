@@ -28,7 +28,6 @@ if __name__ == '__main__':
     connect()
 
 
-
 def get_pokemon(pokename, pokeuid):
     try:
         dbconfig = read_db_config()
@@ -54,6 +53,7 @@ def get_pokemon(pokename, pokeuid):
         cursor.close()
         conn.close()
 
+
 def insert_pokemon(pokename, pokeuid):
     query = "INSERT INTO pokemon(`name`, `pokeuid`, `created`) " \
             "VALUES(%s, %s, NOW())"
@@ -76,9 +76,10 @@ def insert_pokemon(pokename, pokeuid):
         cursor.close()
         conn.close()
 
+
 def insert_pokelocation(pokId, lng, lat, expired):
     query = "INSERT INTO pokemon_location(`pokemon_id`, `lng`, `lat`, expired, created) " \
-           "VALUES(%s, %s, %s, FROM_UNIXTIME(%s), NOW())"
+            "VALUES(%s, %s, %s, FROM_UNIXTIME(%s), NOW())"
 
     args = (pokId, lng, lat, expired)
 
@@ -94,6 +95,32 @@ def insert_pokelocation(pokId, lng, lat, expired):
 
     except Error as error:
         print(error)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_task():
+    try:
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+
+        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 ORDER BY created DESC"
+
+        cursor.execute(query)
+        row = cursor.fetchone()
+        if row:
+            cursor.execute('UPDATE location_for_update SET blocked = 1 WHERE id = ' + format(row[0]))
+            conn.commit()
+            return (row[1], row[2])
+        else:
+            return False
+
+
+    except Error as e:
+        print(e)
 
     finally:
         cursor.close()
