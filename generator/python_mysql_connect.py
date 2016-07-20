@@ -114,9 +114,10 @@ def get_task():
         if row:
             cursor.close()
             conn.close()
-            conn = MySQLConnection(**dbconfig)
-            cursor.execute('UPDATE location_for_update SET blocked = 1 WHERE id = ' + format(row[0]))
-            conn.commit()
+            conn2 = MySQLConnection(**dbconfig)
+            cursor2 = conn2.cursor()
+            cursor2.execute('UPDATE location_for_update SET blocked = 1 WHERE id = ' + format(row[0]))
+            conn2.commit()
             return (row[1], row[2])
         else:
             return False
