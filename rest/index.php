@@ -15,10 +15,10 @@ $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
 
-$app->get('/users/updated', function ($lat, $lng) use ($app) {
+$app->get('/users/updated', function () use ($app) {
 
 	$service = $app['user'];
-	$users = $service->getLast($lat, $lng);
+	$users = $service->getLast();
 	return new Response(\GuzzleHttp\json_encode($users), 200);
 });
 
