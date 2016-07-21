@@ -1,0 +1,16 @@
+{
+  "db": {
+    "dbuser": "root",
+    "dbpass": "root",
+    "dbname": "pgl",
+    "host": "localhost"
+  },
+  "user": {
+    "exp_min": "60"
+  },
+  "generator": {
+    "get_near_location_range": 1000,
+    "min_distance_for_prevent_new_generate": 0.5
+  }
+  
+}

@@ -8,9 +8,11 @@ use Rest\Service\ClearService;
 use Rest\Service\GeneratorService;
 use Rest\Service\PokemonLocation;
 use Rest\Service\UserLocation;
+use Rest\Service\UserProvider;
 use Silex\Application;
 use Silex\Provider\MonologServiceProvider;
 use Rest\Service\APIDBLogger;
+use Silex\Provider\SecurityServiceProvider;
 use Sorien\Provider\PimpleDumpProvider;
 use Symfony\Component\Debug\ErrorHandler;
 use Silex\Provider\DoctrineServiceProvider;
@@ -44,10 +46,15 @@ class SilexApp
 		$app = new Application();
 
 		$app['debug'] = true;
+
 		$app['project_root'] = realpath(__DIR__ . "/../../");
+		$app["app.config"] = \GuzzleHttp\json_decode(file_get_contents($app['project_root']."/config/config.json"), true);
+
+
 		$app['log_folder'] = $app['project_root'] . "/log/";
 
 		$app->register(new PimpleDumpProvider());
+
 
 		$app->register(new MonologServiceProvider(), array(
 			'monolog.logfile' => $app['log_folder'] . '/silex/silex-' . date("Ymd") . '.log',
@@ -56,10 +63,10 @@ class SilexApp
 		$app->register(new DoctrineServiceProvider(), array(
 			'db.options' => array(
 				'driver' => 'pdo_mysql',
-				'host' => 'localhost',
-				'dbname' => 'pokemon',
-				'user' => 'pok',
-				'password' => 'pikapikachu',
+				'host' => $app['app.config']['db']['host'],
+				'dbname' => $app['app.config']['db']['dbname'],
+				'user' => $app['app.config']['db']['dbuser'],
+				'password' =>  $app['app.config']['db']['dbpass'],
 				'charset' => 'utf8',
 			),
 		));
@@ -85,8 +92,11 @@ class SilexApp
 		$app['generator'] = function () {
 			return new GeneratorService();
 		};
-		$app['user'] = function () {
+		$app['userService'] = function () {
 			return new UserLocation();
+		};
+		$app['userProvider'] = function () use ($app) {
+			return new UserProvider($app);
 		};
 		ErrorHandler::register();
 		return $app;
