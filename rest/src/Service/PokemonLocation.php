@@ -50,4 +50,28 @@ class PokemonLocation
 		}
 		return $pokList;
 	}
+
+	public function getAll($lat, $lng) {
+		$app = SilexApp::getApp();
+		$sql = "
+		SELECT pl.expired, pl.lat, pl.lng, p.name, p.pokeuid
+		FROM pokemon_location AS pl
+		LEFT JOIN pokemon AS p ON pl.pokemon_id = p.id
+		GROUP BY pokemon_id, lat, lng
+		";
+		$poks = $app['db']->fetchAll($sql);
+
+		$pokList = [];
+		foreach($poks as $pok) {
+			$pokeResponse = new PokemonResponse();
+			$pokeResponse->lng = (float) $pok["lng"];
+			$pokeResponse->lat = (float) $pok["lat"];
+			$pokeResponse->expired = $pok["expired"];
+			$pokeResponse->pokeName = $pok["name"];
+			$pokeResponse->pokeUid = (int) $pok["pokeuid"];
+			$pokeResponse->distance = (float) $pok["distance"];
+			array_push($pokList, $pok);
+		}
+		return $pokList;
+	}
 }

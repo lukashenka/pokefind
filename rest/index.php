@@ -11,9 +11,17 @@ $app['debug'] = true;
 $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 
 	$service = $app['pokemonLocation'];
-	$pokemons = $service->getNear($lat, $lng, 20000);
+	$pokemons = $service->getNear($lat, $lng, 1);
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
+
+$app->get('/pokemon/list/all', function ($lat, $lng) use ($app) {
+
+	$service = $app['pokemonLocation'];
+	$pokemons = $service->getAll($lat, $lng);
+	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
+});
+
 
 $app->get('/users/updated', function () use ($app) {
 
