@@ -50,20 +50,6 @@
             });
         });
 
-        $.getJSON("../rest/users/updated", function (json) {
-            $.each(json, function (key, data) {
-                var latLng = new google.maps.LatLng(data.lat, data.lng);
-                // Creating a marker and putting it on the map
-                var marker = new google.maps.Marker({
-                    position: latLng,
-                    map: map,
-                    icon: google.maps.SymbolPath.FORWARD_OPEN_ARROW,
-                    title: data.created
-
-                });
-                marker.setMap(map);
-            });
-        });
     }
 
     function handleLocationError(browserHasGeolocation, infoWindow, pos) {
