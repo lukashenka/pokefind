@@ -18,7 +18,7 @@ $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 $app->get('/pokemon/list/all', function () use ($app) {
 
 	$service = $app['pokemonLocation'];
-	$pokemons = $service->getAll($lat, $lng);
+	$pokemons = $service->getAll();
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
 

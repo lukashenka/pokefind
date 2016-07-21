@@ -51,7 +51,7 @@ class PokemonLocation
 		return $pokList;
 	}
 
-	public function getAll($lat, $lng) {
+	public function getAll() {
 		$app = SilexApp::getApp();
 		$sql = "
 		SELECT pl.expired, pl.lat, pl.lng, p.name, p.pokeuid
