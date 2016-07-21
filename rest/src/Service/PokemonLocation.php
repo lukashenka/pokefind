@@ -69,7 +69,7 @@ class PokemonLocation
 			$pokeResponse->expired = $pok["expired"];
 			$pokeResponse->pokeName = $pok["name"];
 			$pokeResponse->pokeUid = (int) $pok["pokeuid"];
-			$pokeResponse->distance = (float) $pok["distance"];
+			$pokeResponse->distance = 9999;
 			array_push($pokList, $pok);
 		}
 		return $pokList;
