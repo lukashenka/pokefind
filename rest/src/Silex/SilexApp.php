@@ -7,6 +7,7 @@ use Rest\Model\UserResponse;
 use Rest\Service\ClearService;
 use Rest\Service\GeneratorService;
 use Rest\Service\PokemonLocation;
+use Rest\Service\UserLocation;
 use Silex\Application;
 use Silex\Provider\MonologServiceProvider;
 use Rest\Service\APIDBLogger;
@@ -85,7 +86,7 @@ class SilexApp
 			return new GeneratorService();
 		};
 		$app['user'] = function () {
-			return new UserResponse();
+			return new UserLocation();
 		};
 		ErrorHandler::register();
 		return $app;
