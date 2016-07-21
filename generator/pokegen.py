@@ -57,7 +57,7 @@ SESSION.verify = False
 global_password = None
 global_token = None
 access_token = None
-DEBUG = True
+DEBUG = False
 VERBOSE_DEBUG = False  # if you want to write raw request/response to the console
 COORDS_LATITUDE = 0
 COORDS_LONGITUDE = 0
@@ -67,7 +67,7 @@ FLOAT_LONG = 0
 NEXT_LAT = 0
 NEXT_LONG = 0
 auto_refresh = 0
-default_step = 0.001
+default_step = 0.002
 api_endpoint = None
 pokemons = {}
 gyms = {}
@@ -189,7 +189,7 @@ def get_location_coords():
 
 
 def retrying_api_req(service, api_endpoint, access_token, *args, **kwargs):
-    while True:
+  
         try:
             response = api_req(service, api_endpoint, access_token, *args,
                                **kwargs)
@@ -554,7 +554,7 @@ def main():
     else:
         print 'No tasks'
         return False
-
+    print 'coords ' + format(origin_lat) + ':' + format(origin_lon) 
     full_path = os.path.realpath(__file__)
     (path, filename) = os.path.split(full_path)
 
