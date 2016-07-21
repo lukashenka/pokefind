@@ -61,7 +61,4 @@ def get_coords(lat, lng, radius_scana = 300, radius_signature = 30):
                     point_lng = round(lng - (delta_lng * j), 6)
                     if not check_in_list(result, point_lat, point_lng):
                         result.append((point_lat, point_lng))
-
     print(result)
-
-get_coords(53.905053, 27.489044)
