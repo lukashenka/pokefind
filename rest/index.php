@@ -59,6 +59,13 @@ $app->get('/users/updated', function () use ($app) {
 	return new Response(\GuzzleHttp\json_encode($users), 200);
 });
 
+$app->get('/users/positionQueue', function () use ($app) {
+
+	$service = $app['userProgress'];
+	$position = $service->getQueuePosition();
+	return new Response(\GuzzleHttp\json_encode($position), 200);
+});
+
 $app->get('clearExpired' ,function() use ($app) {
 	$sevice = $app['clearService'];
 	$sevice->expired();

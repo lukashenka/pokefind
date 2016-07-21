@@ -10,6 +10,7 @@ namespace Rest\Service;
 
 
 use Rest\Model\UserLoadProgressResponse;
+use Rest\Model\UserPositionQueueResponse;
 use Rest\Silex\SilexApp;
 
 class UserProgress
@@ -30,7 +31,7 @@ class UserProgress
 
 		$progress = $db->fetchAssoc($sql, ['userId' => $user->id]);
 		$progressResponse = new UserLoadProgressResponse();
-		if($progress) {
+		if ($progress) {
 			$progressResponse->userGUID = $user->userGUID;
 			$progressResponse->curStep = $progress["steps"];
 			$progressResponse->steps = $progress["current_step"];
@@ -41,6 +42,54 @@ class UserProgress
 
 		return $progressResponse;
 
+
+	}
+
+	public function getQueuePosition()
+	{
+		$app = SilexApp::getApp();
+		$user = $app['userProvider']->getUserSession();
+		$db = $app['db'];
+
+		$positionQueue = new UserPositionQueueResponse();
+
+
+		$sql = "SELECT lf.id
+				FROM location_for_update AS lf
+				WHERE blocked = 0 AND user_session_id =  :user_id
+				ORDER BY lf.created ASC
+				LIMIT 1
+		";
+		$processId = $db->fetchColumn($sql, ["user_id" => $user->id]);
+
+		if (!$processId) {
+			return $positionQueue;
+		}
+
+		$positionQueue->isLoading = true;
+
+		$totalSql = "
+				SELECT COUNT(*)
+				FROM location_for_update AS lf
+				WHERE blocked = 0
+				ORDER BY lf.created ASC
+
+		";
+		$total = (int)$db->fetchColumn($totalSql);
+		$positionQueue->total = $total;
+
+
+		$positionSql = "
+				SELECT COUNT(*)
+				FROM location_for_update AS lf
+				WHERE blocked = 0 AND id <= :id
+				ORDER BY lf.created ASC
+
+		";
+		$position = (int)$db->fetchColumn($positionSql, ['id' => $processId]);
+		$positionQueue->position = $position;
+
+		return $positionQueue;
 
 	}
 }
