@@ -13,7 +13,7 @@ class UserLocation
 	{
 		$usersSql = "SELECT lat,lng, created
                              FROM location_for_update
-                            WHERE created <= NOW() - INTERVAL 1 HOUR
+                            WHERE created >= NOW() - INTERVAL 1 HOUR
 		";
 
 		$app = SilexApp::getApp();
