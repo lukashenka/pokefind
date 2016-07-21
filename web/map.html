@@ -34,7 +34,7 @@
         var infoWindow = new google.maps.InfoWindow({map: map});
 
 
-        $.getJSON("../rest/pokemon/list/" + map.center.lat + "/" + map.center.lng + "", function (json) {
+        $.getJSON("../rest/pokemon/list/" + 53.897363 + "/" + 27.556173 + "", function (json) {
             $.each(json, function (key, data) {
                 var latLng = new google.maps.LatLng(data.lat, data.lng);
                 // Creating a marker and putting it on the map
