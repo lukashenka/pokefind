@@ -32,4 +32,43 @@ class UserLocation
 		return $usersResponse;
 	}
 
+	public function getUserNear($lat, $lng) {
+		$app = SilexApp::getApp();
+
+		$db = $app['db'];
+		$distance = $app['app.config']['user']['min_distance_for_show_near_user'];
+		$minute = $app['app.config']['user']['min_minutes_for_show_near_user'];
+
+		$sql = "
+		SELECT t.updated, t.lat, t.lng, u.guid,
+		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
+		FROM user_session_track AS t
+		LEFT JOIN user_sessions as u ON u.id = t.user_session_id
+		WHERE t.updated > NOW() - INTERVAL :minute MINUTE
+		GROUP BY t.user_session_id, lat, lng
+		HAVING distance < :kilometers
+		ORDER BY distance
+		";
+
+		$users = $db->fetchAll($sql, ['lat' => $lat,
+											'lng' => $lng,
+											'kilometers' => $distance,
+											'minute' => $minute
+		]);
+
+
+		$userList = [];
+		foreach ($users as $user) {
+			$userResponse = new UserResponse();
+			$userResponse->userGUID = $user["guid"];
+			$userResponse->lng = (float)$user["lng"];
+			$userResponse->lat = (float)$user["lat"];
+			$userResponse->updated = $user["updated"];
+			array_push($userList, $user);
+		}
+		return $userList;
+
+
+	}
+
 }

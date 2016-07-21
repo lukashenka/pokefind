@@ -107,7 +107,7 @@ def get_task():
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
 
-        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 ORDER BY created DESC"
+        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 GROUP BY user_session_id ORDER BY created DESC"
 
         cursor.execute(query)
         row = cursor.fetchone()
@@ -118,12 +118,89 @@ def get_task():
             cursor2 = conn2.cursor()
             cursor2.execute('UPDATE location_for_update SET blocked = 1 WHERE id = ' + format(row[0]))
             conn2.commit()
-            return (row[1], row[2])
+            return (row[0], row[1], row[2])
         else:
             return False
-
 
     except Error as e:
         print(e)
 
 
+def get_generation_log_id(update_location_id):
+    try:
+
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+
+        query = "SELECT id FROM generation_log WHERE update_location_id = %s"
+        args = (update_location_id,)
+        cursor.execute(query, args)
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        else:
+            query = "INSERT INTO generation_log(`update_location_id`) " \
+                        "VALUES(%s)"
+            db_config = read_db_config()
+            conn = MySQLConnection(**db_config)
+            cursor = conn.cursor()
+            cursor.execute(query, (update_location_id,))
+            conn.commit()
+            return cursor.lastrowid
+
+    except Error as error:
+        print(error)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def set_step(id, steps, curStep):
+    try:
+
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+
+        query = "UPDATE generation_log SET current_step = %s, steps = %s WHERE id = %s"
+        db_config = read_db_config()
+        conn = MySQLConnection(**db_config)
+        cursor = conn.cursor()
+        steps = format(steps)
+        cursor.execute(query, (curStep, steps, id))
+        conn.commit()
+        return cursor.lastrowid
+
+    except Error as error:
+        print(error)
+
+    finally:
+        cursor.close()
+        conn.close()
+
+def set_step_status(id, done, fail):
+    try:
+
+        dbconfig = read_db_config()
+        conn = MySQLConnection(**dbconfig)
+        cursor = conn.cursor()
+
+        query = "UPDATE generation_log SET  done= %s,  fail= %s WHERE id = %s"
+
+        args = (done, fail, id)
+
+        db_config = read_db_config()
+        conn = MySQLConnection(**db_config)
+        cursor = conn.cursor()
+        cursor.execute(query, args)
+        conn.commit()
+        return cursor.lastrowid
+
+    except Error as error:
+        print(error)
+
+    finally:
+        cursor.close()
+        conn.close()

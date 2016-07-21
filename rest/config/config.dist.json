@@ -6,7 +6,9 @@
     "host": "localhost"
   },
   "user": {
-    "exp_min": "60"
+    "exp_min": "60",
+    "min_distance_for_show_near_user": 10,
+    "min_minutes_for_show_near_user": 120
   },
   "generator": {
     "get_near_location_range": 1000,

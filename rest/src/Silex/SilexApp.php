@@ -8,6 +8,7 @@ use Rest\Service\ClearService;
 use Rest\Service\GeneratorService;
 use Rest\Service\PokemonLocation;
 use Rest\Service\UserLocation;
+use Rest\Service\UserProgress;
 use Rest\Service\UserProvider;
 use Silex\Application;
 use Silex\Provider\MonologServiceProvider;
@@ -97,6 +98,9 @@ class SilexApp
 		};
 		$app['userProvider'] = function () use ($app) {
 			return new UserProvider($app);
+		};
+		$app['userProgress'] = function () use ($app) {
+			return new UserProgress();
 		};
 		ErrorHandler::register();
 		return $app;

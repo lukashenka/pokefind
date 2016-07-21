@@ -28,6 +28,22 @@ $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
 
+
+$app->get('/user/loadProgress', function () use ($app) {
+
+	$service = $app['userProgress'];
+	$progress = $service->getProgress();
+	return new Response(\GuzzleHttp\json_encode((array) $progress), 200);
+});
+
+$app->get('/user/getNear/{lat}/{lng}', function ($lat, $lng) use ($app) {
+
+	$service = $app['userService'];
+	$users = $service->getUserNear($lat, $lng);
+	return new Response(\GuzzleHttp\json_encode((array) $users), 200);
+});
+
+
 $app->get('/pokemon/list/all', function () use ($app) {
 
 	$service = $app['pokemonLocation'];

@@ -49,7 +49,7 @@ ANDROID_ID = credentials.get('android_id', None)
 SERVICE = credentials.get('service', None)
 CLIENT_SIG = credentials.get('client_sig', None)
 GOOGLEMAPS_KEY = credentials.get('gmaps_key', None)
-
+UPDATE_LOCATION_ID = 0
 SESSION = requests.session()
 SESSION.headers.update({'User-Agent': 'Niantic App'})
 SESSION.verify = False
@@ -67,13 +67,13 @@ FLOAT_LONG = 0
 NEXT_LAT = 0
 NEXT_LONG = 0
 auto_refresh = 0
-default_step = 0.002
+default_step = 0.001
 api_endpoint = None
 pokemons = {}
 gyms = {}
 pokestops = {}
 numbertoteam = {
-# At least I'm pretty sure that's it. I could be wrong and then I'd be displaying the wrong owner team of gyms.
+    # At least I'm pretty sure that's it. I could be wrong and then I'd be displaying the wrong owner team of gyms.
     0: 'Gym',
     1: 'Mystic',
     2: 'Valor',
@@ -151,10 +151,6 @@ def f2h(float):
 def h2f(hex):
     return struct.unpack('<d', struct.pack('<Q', int(hex, 16)))[0]
 
-
-
-
-
 def set_location(location_name):
     geolocator = GoogleV3()
     prog = re.compile('^(\-?\d+(\.\d+)?),\s*(\-?\d+(\.\d+)?)$')
@@ -189,16 +185,15 @@ def get_location_coords():
 
 
 def retrying_api_req(service, api_endpoint, access_token, *args, **kwargs):
-  
-        try:
-            response = api_req(service, api_endpoint, access_token, *args,
-                               **kwargs)
-            if response:
-                return response
-            debug('retrying_api_req: api_req returned None, retrying')
-        except (InvalidURL, ConnectionError, DecodeError), e:
-            debug('retrying_api_req: request error ({}), retrying'.format(
-                str(e)))
+    try:
+        response = api_req(service, api_endpoint, access_token, *args,
+                           **kwargs)
+        if response:
+            return response
+        debug('retrying_api_req: api_req returned None, retrying')
+    except (InvalidURL, ConnectionError, DecodeError), e:
+        debug('retrying_api_req: request error ({}), retrying'.format(
+            str(e)))
 
 
 def api_req(service, api_endpoint, access_token, *args, **kwargs):
@@ -543,92 +538,102 @@ def login(args):
 
 
 def main():
+    task = get_task()
 
-    coords = get_task()
-
-    if(coords):
+    if (task):
         global origin_lat
         global origin_lon
-        origin_lat = coords[0]
-        origin_lon = coords[1]
+        global UPDATE_LOCATION_ID
+        UPDATE_LOCATION_ID = task[0]
+
+        origin_lat = task[1]
+        origin_lon = task[2]
     else:
         print 'No tasks'
         return False
-    print 'coords ' + format(origin_lat) + ':' + format(origin_lon) 
-    full_path = os.path.realpath(__file__)
-    (path, filename) = os.path.split(full_path)
 
-    args = get_args()
+    try:
 
-    if args.auth_service not in ['ptc', 'google']:
-        print '[!] Invalid Auth service specified'
-        return
+        generateLogId = get_generation_log_id(UPDATE_LOCATION_ID)
 
-    print('[+] Locale is ' + args.locale)
-    pokemonsJSON = json.load(
-        open(path + '/locales/pokemon.' + args.locale + '.json'))
+        print 'coords ' + format(origin_lat) + ':' + format(origin_lon) + "UPDATE_LOCATION_ID: " + format(UPDATE_LOCATION_ID)
+        full_path = os.path.realpath(__file__)
+        (path, filename) = os.path.split(full_path)
 
-    if args.debug:
-        global DEBUG
-        DEBUG = True
-        print '[!] DEBUG mode on'
+        args = get_args()
+
+        if args.auth_service not in ['ptc', 'google']:
+            print '[!] Invalid Auth service specified'
+            return
+
+        print('[+] Locale is ' + args.locale)
+        pokemonsJSON = json.load(
+            open(path + '/locales/pokemon.' + args.locale + '.json'))
+
+        if args.debug:
+            global DEBUG
+            DEBUG = True
+            print '[!] DEBUG mode on'
+
+        if args.auto_refresh:
+            global auto_refresh
+            auto_refresh = int(args.auto_refresh) * 1000
+
+        if args.ampm_clock:
+            global is_ampm_clock
+            is_ampm_clock = True
+
+        api_endpoint, access_token, profile_response = login(args)
+
+        steplimit = int(args.step_limit)
+
+        ignore = []
+        only = []
+        if args.ignore:
+            ignore = [i.lower().strip() for i in args.ignore.split(',')]
+        elif args.only:
+            only = [i.lower().strip() for i in args.only.split(',')]
+
+        pos = 1
+        x = 0
+        y = 0
+        dx = 0
+        dy = -1
+        steplimit2 = steplimit ** 2
+        for step in range(steplimit2):
+            # starting at 0 index
+            debug('looping: step {} of {}'.format((step + 1), steplimit ** 2))
+            # debug('steplimit: {} x: {} y: {} pos: {} dx: {} dy {}'.format(steplimit2, x, y, pos, dx, dy))
+            # Scan location math
+            if -steplimit2 / 2 < x <= steplimit2 / 2 and -steplimit2 / 2 < y <= steplimit2 / 2:
+                set_location_coords(x * 0.0025 + origin_lat, y * 0.0025 + origin_lon, 0)
+            if x == y or x < 0 and x == -y or x > 0 and x == 1 - y:
+                (dx, dy) = (-dy, dx)
+
+            (x, y) = (x + dx, y + dy)
+
+            process_step(args, api_endpoint, access_token, profile_response,
+                         pokemonsJSON, ignore, only)
 
 
-    if args.auto_refresh:
-        global auto_refresh
-        auto_refresh = int(args.auto_refresh) * 1000
+            set_step(generateLogId, steplimit2, step +1)
+            print('Completed: ' + str(
+                ((step + 1) + pos * .25 - .25) / (steplimit2) * 100) + '%')
 
-    if args.ampm_clock:
-        global is_ampm_clock
-        is_ampm_clock = True
+        global NEXT_LAT, NEXT_LONG
+        if (NEXT_LAT and NEXT_LONG and
+                (NEXT_LAT != FLOAT_LAT or NEXT_LONG != FLOAT_LONG)):
+            print('Update to next location %f, %f' % (NEXT_LAT, NEXT_LONG))
+            set_location_coords(NEXT_LAT, NEXT_LONG, 0)
+            NEXT_LAT = 0
+            NEXT_LONG = 0
+        else:
+            set_location_coords(origin_lat, origin_lon, 0)
 
-    api_endpoint, access_token, profile_response = login(args)
+        set_step_status(generateLogId, 1, 0)
 
-    steplimit = int(args.step_limit)
-
-    ignore = []
-    only = []
-    if args.ignore:
-        ignore = [i.lower().strip() for i in args.ignore.split(',')]
-    elif args.only:
-        only = [i.lower().strip() for i in args.only.split(',')]
-
-    pos = 1
-    x = 0
-    y = 0
-    dx = 0
-    dy = -1
-    steplimit2 = steplimit ** 2
-    for step in range(steplimit2):
-        # starting at 0 index
-        debug('looping: step {} of {}'.format((step + 1), steplimit ** 2))
-        # debug('steplimit: {} x: {} y: {} pos: {} dx: {} dy {}'.format(steplimit2, x, y, pos, dx, dy))
-        # Scan location math
-        if -steplimit2 / 2 < x <= steplimit2 / 2 and -steplimit2 / 2 < y <= steplimit2 / 2:
-            set_location_coords(x * 0.0025 + origin_lat, y * 0.0025 + origin_lon, 0)
-        if x == y or x < 0 and x == -y or x > 0 and x == 1 - y:
-            (dx, dy) = (-dy, dx)
-
-        (x, y) = (x + dx, y + dy)
-
-        process_step(args, api_endpoint, access_token, profile_response,
-                     pokemonsJSON, ignore, only)
-
-        print('Completed: ' + str(
-            ((step + 1) + pos * .25 - .25) / (steplimit2) * 100) + '%')
-
-    global NEXT_LAT, NEXT_LONG
-    if (NEXT_LAT and NEXT_LONG and
-            (NEXT_LAT != FLOAT_LAT or NEXT_LONG != FLOAT_LONG)):
-        print('Update to next location %f, %f' % (NEXT_LAT, NEXT_LONG))
-        set_location_coords(NEXT_LAT, NEXT_LONG, 0)
-        NEXT_LAT = 0
-        NEXT_LONG = 0
-    else:
-        set_location_coords(origin_lat, origin_lon, 0)
-
-    register_background_thread()
-
+    except Error as error:
+        print(error)
 
 def process_step(args, api_endpoint, access_token, profile_response,
                  pokemonsJSON, ignore, only):
@@ -712,41 +717,6 @@ def process_step(args, api_endpoint, access_token, profile_response,
         id = get_pokemon(pokename, poke.pokemon.PokemonId)
         insert_pokelocation(id, poke.Longitude, poke.Latitude, disappear_timestamp)
 
-
-def register_background_thread(initial_registration=False):
-    """
-    Start a background thread to search for Pokemon
-    while Flask is still able to serve requests for the map
-    :param initial_registration: True if first registration and thread should start immediately, False if it's being called by the finishing thread to schedule a refresh
-    :return: None
-    """
-
-    debug('register_background_thread called')
-    global search_thread
-
-    if initial_registration:
-        if not werkzeug.serving.is_running_from_reloader():
-            debug(
-                'register_background_thread: not running inside Flask so not starting thread')
-            return
-        if search_thread:
-            debug(
-                'register_background_thread: initial registration requested but thread already running')
-            return
-
-        debug('register_background_thread: initial registration')
-        search_thread = threading.Thread(target=main)
-
-    else:
-        debug('register_background_thread: queueing')
-        search_thread = threading.Timer(30, main)  # delay, in seconds
-
-    search_thread.daemon = True
-    search_thread.name = 'search_thread'
-    search_thread.start()
-
-
 if __name__ == '__main__':
     args = get_args()
-    register_background_thread(initial_registration=True)
     main()
