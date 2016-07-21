@@ -28,47 +28,33 @@
 
     function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: -34.397, lng: 150.644},
+            center: {lat: 53.397, lng: 23.644},
             zoom: 6
         });
         var infoWindow = new google.maps.InfoWindow({map: map});
 
-        // Try HTML5 geolocation.
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
 
+        $.getJSON("../rest/pokemon/list/" + pos.lat + "/" + pos.lng + "", function (json) {
+            $.each(json, function (key, data) {
+                var latLng = new google.maps.LatLng(data.lat, data.lng);
+                // Creating a marker and putting it on the map
+                var image = "assets/larger-icons/" + data.pokeuid + ".png";
+                var marker = new google.maps.Marker({
+                    position: latLng,
+                    map: map,
+                    icon: image,
+                    title: data.name
 
-                $.getJSON("../rest/pokemon/list/" + pos.lat + "/" + pos.lng + "", function (json) {
-                    $.each(json, function (key, data) {
-                        var latLng = new google.maps.LatLng(data.lat, data.lng);
-                        // Creating a marker and putting it on the map
-                        var image = "assets/larger-icons/"+data.pokeuid + ".png";
-                        var marker = new google.maps.Marker({
-                            position: latLng,
-                            map: map,
-                            icon: image,
-                            title: data.name
-
-                        });
-                        marker.setMap(map);
-                    });
                 });
-
-
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Location found.');
-                map.setCenter(pos);
-            }, function () {
-                handleLocationError(true, infoWindow, map.getCenter());
+                marker.setMap(map);
             });
-        } else {
-            // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
-        }
+        });
+
+
+        infoWindow.setPosition(pos);
+        infoWindow.setContent('Location found.');
+        map.setCenter(pos);
+
     }
 
     function handleLocationError(browserHasGeolocation, infoWindow, pos) {
@@ -79,7 +65,7 @@
     }
 </script>
 <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDSTxRVsegWaSmb6GgWEVOO4isAWqmXVBsA&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCikaAuFeu9nDzJ4dy5Ykvdbigbx5Fs6c4&callback=initMap">
 </script>
 </body>
 </html>

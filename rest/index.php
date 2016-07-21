@@ -11,7 +11,7 @@ $app['debug'] = true;
 $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 
 	$service = $app['pokemonLocation'];
-	$pokemons = $service->getNear($lat, $lng, 1);
+	$pokemons = $service->getNear($lat, $lng, 200);
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
 
