@@ -36,15 +36,9 @@ $app->get('clearExpired' ,function() use ($app) {
 	return "OK";
 });
 $app->finish(function (Request $request, Response $response) use ($app) {
-//	$logger = $app["apiDBLogger"];
-//	$logger->write(
-//		$request->getUri(),
-//		json_encode($request->headers->all()),
-//		$request->getContent(),
-//		json_encode($response->headers->all()),
-//		$response->getContent(),
-//		$response->getStatusCode()
-//	);
+	$app['logger']->addInfo("Request: " . $request);
+	$app['logger']->addInfo("Response: " . $response);
+
 });
 
 $app->run();
