@@ -11,7 +11,7 @@ class UserLocation
 
 	public function getLast()
 	{
-		$usersSql = "SELECT (lat,lng, created
+		$usersSql = "SELECT lat,lng, created
                              FROM location_for_update
                             WHERE created <= NOW() - INTERVAL 1 HOUR
 		";
