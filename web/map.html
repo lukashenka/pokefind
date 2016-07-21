@@ -50,7 +50,7 @@
             });
         });
 
-        $.getJSON("../rest/users/updated" + 53.397 + "/" + 23.644 + "", function (json) {
+        $.getJSON("../rest/users/updated", function (json) {
             $.each(json, function (key, data) {
                 var latLng = new google.maps.LatLng(data.lat, data.lng);
                 // Creating a marker and putting it on the map
