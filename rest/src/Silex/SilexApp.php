@@ -3,6 +3,7 @@
 namespace Rest\Silex;
 
 use Monolog\Handler\StreamHandler;
+use Rest\Model\UserResponse;
 use Rest\Service\ClearService;
 use Rest\Service\GeneratorService;
 use Rest\Service\PokemonLocation;
@@ -82,6 +83,9 @@ class SilexApp
 		};
 		$app['generator'] = function () {
 			return new GeneratorService();
+		};
+		$app['user'] = function () {
+			return new UserResponse();
 		};
 		ErrorHandler::register();
 		return $app;
