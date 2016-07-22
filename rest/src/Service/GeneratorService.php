@@ -21,12 +21,13 @@ class GeneratorService
 
 		$nearJobs = "SELECT (6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng) ) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
                              FROM location_for_update 
-                            WHERE blocked = 0
+                            WHERE created >= NOW() - INTERVAL :expired_sec SECOND
 				 HAVING distance < :distance";
 		$nearJobs = $db->fetchAll($nearJobs, [
 			'lat' => $lat,
 			'lng' => $lng,
-			'distance' => $app['app.config']['generator']['min_distance_for_prevent_new_generate']
+			'distance' => $app['app.config']['generator']['min_distance_for_prevent_new_generate'],
+			'expired_sec' => $app['app.config']['generator']['expired_sec_for_prevent_generate']
 		]);
 		if (count($nearJobs) == 0) {
 

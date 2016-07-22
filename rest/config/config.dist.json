@@ -12,7 +12,8 @@
   },
   "generator": {
     "get_near_location_range": 1000,
-    "min_distance_for_prevent_new_generate": 0.5
+    "min_distance_for_prevent_new_generate": 0.5,
+    "expired_sec_for_prevent_generate": 30
   }
   
 }
