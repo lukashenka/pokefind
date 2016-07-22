@@ -23,7 +23,7 @@ $app->get('/pokemon/list/{lat}/{lng}', function ($lat, $lng) use ($app) {
 	$app['userProvider']->track($lat, $lng);
 
 	$service = $app['pokemonLocation'];
-	$pokemons = $service->getNear($lat, $lng, 1);
+	$pokemons = $service->getNear($lat, $lng);
 
 	return new Response(\GuzzleHttp\json_encode($pokemons), 200);
 });
