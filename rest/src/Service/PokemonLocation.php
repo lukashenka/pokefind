@@ -53,7 +53,7 @@ class PokemonLocation
 			$pokeResponse->lng = (float)$pok["lng"];
 			$pokeResponse->lat = (float)$pok["lat"];
 			$date = new \DateTime($pok["expired"]);
-			$pokeResponse->expired = "sdfsdsd";
+			$pokeResponse->expired = $date->format('c');
 			$pokeResponse->pokeName = $pok["name"];
 			$pokeResponse->pokeUid = (int)$pok["pokeuid"];
 			$pokeResponse->distance = (float)$pok["distance"];
