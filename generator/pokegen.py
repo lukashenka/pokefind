@@ -241,7 +241,7 @@ def api_req(service, api_endpoint, access_token, *args, **kwargs):
 def get_api_endpoint(service, access_token, api=API_URL):
     profile_response = None
     while not profile_response:
-        profile_response = get_profile(service, access_token, api,
+        profile_response = retrying_get_profile(service, access_token, api,
                                                 None)
         if not hasattr(profile_response, 'api_url'):
             debug(
@@ -256,7 +256,7 @@ def get_api_endpoint(service, access_token, api=API_URL):
     return 'https://%s/rpc' % profile_response.api_url
 
 
-def get_profile(service, access_token, api, useauth, *reqq):
+def retrying_get_profile(service, access_token, api, useauth, *reqq):
     profile_response = None
         profile_response = get_profile(service, access_token, api, useauth,
                                        *reqq)
