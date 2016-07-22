@@ -57,7 +57,7 @@ SESSION.verify = False
 global_password = None
 global_token = None
 access_token = None
-DEBUG = True
+DEBUG = False
 VERBOSE_DEBUG = False  # if you want to write raw request/response to the console
 COORDS_LATITUDE = 0
 COORDS_LONGITUDE = 0
@@ -258,11 +258,18 @@ def get_api_endpoint(service, access_token, api=API_URL):
 
 def retrying_get_profile(service, access_token, api, useauth, *reqq):
     profile_response = None
+    while not profile_response:
         profile_response = get_profile(service, access_token, api, useauth,
                                        *reqq)
         if not hasattr(profile_response, 'payload'):
-            print('Profile Response FAILS no payload')
-            return false
+            debug(
+                'retrying_get_profile: get_profile returned no payload, retrying')
+            profile_response = None
+            continue
+        if not profile_response.payload:
+            debug(
+                'retrying_get_profile: get_profile returned no-len payload, retrying')
+            profile_response = None
 
     return profile_response
 
