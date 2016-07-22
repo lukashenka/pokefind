@@ -241,7 +241,7 @@ def api_req(service, api_endpoint, access_token, *args, **kwargs):
 def get_api_endpoint(service, access_token, api=API_URL):
     profile_response = None
     while not profile_response:
-        profile_response = retrying_get_profile(service, access_token, api,
+        profile_response = get_profile(service, access_token, api,
                                                 None)
         if not hasattr(profile_response, 'api_url'):
             debug(
@@ -256,20 +256,13 @@ def get_api_endpoint(service, access_token, api=API_URL):
     return 'https://%s/rpc' % profile_response.api_url
 
 
-def retrying_get_profile(service, access_token, api, useauth, *reqq):
+def get_profile(service, access_token, api, useauth, *reqq):
     profile_response = None
-    while not profile_response:
         profile_response = get_profile(service, access_token, api, useauth,
                                        *reqq)
         if not hasattr(profile_response, 'payload'):
-            debug(
-                'retrying_get_profile: get_profile returned no payload, retrying')
-            profile_response = None
-            continue
-        if not profile_response.payload:
-            debug(
-                'retrying_get_profile: get_profile returned no-len payload, retrying')
-            profile_response = None
+            print('Profile Response FAILS no payload')
+            return false
 
     return profile_response
 
