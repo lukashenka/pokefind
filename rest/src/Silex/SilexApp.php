@@ -2,6 +2,7 @@
 
 namespace Rest\Silex;
 
+use Knp\Provider\ConsoleServiceProvider;
 use Monolog\Handler\StreamHandler;
 use Rest\Model\UserResponse;
 use Rest\Service\ClearService;
@@ -79,6 +80,13 @@ class SilexApp
 			$log->pushHandler($handler);
 			return $log;
 		};
+
+		$app->register(new ConsoleServiceProvider(), array(
+			'console.name'              => 'MyApplication',
+			'console.version'           => '1.0.0',
+			'console.project_directory' => __DIR__.'/..'
+		));
+
 
 
 		$app['apiDBLogger'] = function () {

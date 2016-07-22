@@ -24,6 +24,8 @@ class PokemonLocation
 	{
 		$app = SilexApp::getApp();
 
+		$app['clearService']->expired();
+
 		$sql = "
 		SELECT pl.expired, pl.lat, pl.lng, p.name, p.pokeuid,
 		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance

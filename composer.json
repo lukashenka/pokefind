@@ -11,7 +11,8 @@
         "guzzlehttp/guzzle": "*",
         "monolog/monolog": "*",
         "symfony/security": "*",
-        "symfony/debug": "*"
+        "symfony/debug": "*",
+        "knplabs/console-service-provider": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "*",
