@@ -7,8 +7,8 @@ class PokemonResponse
 {
 
 	public $pokeName;
-	public $pokeUid;
-	public $lat;
+	public $pokeuid;
+	public $name;
 	public $lng;
 	public $distance;
 	public $expired;

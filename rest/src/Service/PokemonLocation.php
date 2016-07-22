@@ -54,8 +54,8 @@ class PokemonLocation
 			$pokeResponse->lat = (float)$pok["lat"];
 			$date = new \DateTime($pok["expired"]);
 			$pokeResponse->expired = $date->format('c');
-			$pokeResponse->pokeName = $pok["name"];
-			$pokeResponse->pokeUid = (int)$pok["pokeuid"];
+			$pokeResponse->name = $pok["name"];
+			$pokeResponse->pokeuid = (int)$pok["pokeuid"];
 			$pokeResponse->distance = (float)$pok["distance"];
 			array_push($pokList, $pokeResponse);
 		}
@@ -78,11 +78,12 @@ class PokemonLocation
 			$pokeResponse = new PokemonResponse();
 			$pokeResponse->lng = (float)$pok["lng"];
 			$pokeResponse->lat = (float)$pok["lat"];
-			$pokeResponse->expired = $pok["expired"];
-			$pokeResponse->pokeName = $pok["name"];
-			$pokeResponse->pokeUid = (int)$pok["pokeuid"];
+			$date = new \DateTime($pok["expired"]);
+			$pokeResponse->expired = $date->format('c');
+			$pokeResponse->name = $pok["name"];
+			$pokeResponse->pokeuid = (int)$pok["pokeuid"];
 			$pokeResponse->distance = 9999;
-			array_push($pokList, $pok);
+			array_push($pokList, $pokeResponse);
 		}
 		return $pokList;
 	}
