@@ -57,7 +57,7 @@ class PokemonLocation
 			$pokeResponse->pokeName = $pok["name"];
 			$pokeResponse->pokeUid = (int)$pok["pokeuid"];
 			$pokeResponse->distance = (float)$pok["distance"];
-			array_push($pokList, $pok);
+			array_push($pokList, $pokeResponse);
 		}
 		return $pokList;
 	}
