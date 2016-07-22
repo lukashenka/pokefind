@@ -14,5 +14,5 @@ class UserPositionQueueResponse
 
 	public $position = 0;
 	public $total = 0;
-	public $isLoading = false;
+	public $isWaited = false;
 }

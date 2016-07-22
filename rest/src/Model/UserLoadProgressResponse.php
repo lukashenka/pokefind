@@ -14,9 +14,10 @@ class UserLoadProgressResponse
 
 	public $userGUID;
 	public $isLoading = false;
-	public $steps;
-	public $curStep;
-	public $done;
-	public $fail;
+	public $steps = 0;
+	public $curStep = 0;
+	public $done = 0;
+	public $fail = 0;
+	public $isStarted = false;
 
 }

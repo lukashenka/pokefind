@@ -21,10 +21,10 @@ class UserProgress
 		$user = $app['userProvider']->getUserSession();
 		$db = $app['db'];
 
-		$sql = "SELECT gl.current_step, gl.steps, gl.done, gl.fail
+		$sql = "SELECT gl.current_step, gl.steps, gl.done, gl.fail, gl.id
 				FROM location_for_update AS lf
 				LEFT JOIN generation_log AS gl ON lf.id = gl.update_location_id
-				WHERE lf.user_session_id = :userId AND gl.id IS NOT NULL
+				WHERE lf.user_session_id = :userId
 				ORDER BY lf.created DESC
 				LIMIT 1
 				";
@@ -38,6 +38,7 @@ class UserProgress
 			$progressResponse->done = $progress["done"];
 			$progressResponse->fail = $progress["fail"];
 			$progressResponse->isLoading = true;
+			$progressResponse->isStarted = ($progress["id"]) ? true : false;
 		}
 
 		return $progressResponse;
@@ -65,8 +66,7 @@ class UserProgress
 		if (!$processId) {
 			return $positionQueue;
 		}
-
-		$positionQueue->isLoading = true;
+		$positionQueue->isWaited = true;
 
 		$totalSql = "
 				SELECT COUNT(*)
