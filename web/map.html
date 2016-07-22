@@ -26,6 +26,10 @@
     // failed.", it means you probably did not give permission for the browser to
     // locate you.
 
+    function setHeader(xhr) {
+        xhr.setRequestHeader('Useruuid', 'hui');
+    }
+
     function initMap() {
         var map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 53.897363, lng: 27.556173},
@@ -34,48 +38,42 @@
         var infoWindow = new google.maps.InfoWindow({map: map});
 
 
-        $.getJSON("../rest/pokemon/list/all", function (json) {
-            $.each(json, function (key, data) {
+        $.ajax({
+            url: "../rest/pokemon/list/all",
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: setHeader,
+            success: function (json) {
+                $.each(json, function (key, data) {
 
-                var infowindow = new google.maps.InfoWindow({
-                    content: '' +
-                    'Имя: ' + data.name + '<br>' +
-                    'Истекает:  ' + data.expired + '<br>'
+                    var infowindow = new google.maps.InfoWindow({
+                        content: '' +
+                        'Имя: ' + data.name + '<br>' +
+                        'Истекает:  ' + data.expired + '<br>'
 
+                    });
+
+
+                    var latLng = new google.maps.LatLng(data.lat, data.lng);
+                    // Creating a marker and putting it on the map
+                    var image = "assets/larger-icons/" + data.pokeuid + ".png";
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map,
+                        icon: image,
+                        title: data.name
+
+                    });
+                    marker.setMap(map);
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                    });
                 });
-
-
-                var latLng = new google.maps.LatLng(data.lat, data.lng);
-                // Creating a marker and putting it on the map
-                var image = "assets/larger-icons/" + data.pokeuid + ".png";
-                var marker = new google.maps.Marker({
-                    position: latLng,
-                    map: map,
-                    icon: image,
-                    title: data.name
-
-                });
-                marker.setMap(map);
-                marker.addListener('click', function () {
-                    infowindow.open(map, marker);
-                });
-            });
+            }
         });
 
-        $.getJSON("../rest/users/updated", function (json) {
-            $.each(json, function (key, data) {
-                var latLng = new google.maps.LatLng(data.lat, data.lng);
-                // Creating a marker and putting it on the map
-                var marker = new google.maps.Marker({
-                    position: latLng,
-                    map: map,
-                    icon: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png",
-                    title: data.created
 
-                });
-                marker.setMap(map);
-            });
-        });
+
     }
 
 
