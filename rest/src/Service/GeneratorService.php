@@ -11,7 +11,7 @@ use Rest\Silex\SilexApp;
 
 class GeneratorService
 {
-	const MIN_POKEMONS_FOR_NEW_GENERATE = 20;
+	const MIN_POKEMONS_FOR_NEW_GENERATE = 10;
 
 	public function addGeneratorTask($lat, $lng)
 	{

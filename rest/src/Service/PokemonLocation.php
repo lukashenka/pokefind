@@ -26,6 +26,29 @@ class PokemonLocation
 
 //		$app['clearService']->expired();
 
+
+		$genSql = "
+		SELECT COUNT(*),
+		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
+		FROM pokemon_location AS pl
+		LEFT JOIN pokemon AS p ON pl.pokemon_id = p.id
+		WHERE pl.expired >= NOW() - INTERVAL 2 MINUTE
+		GROUP BY pokemon_id, lat, lng
+		HAVING distance < :kilometers
+		ORDER BY distance
+		";
+
+		$count = (int) $app['db']->fetchColumn($genSql, ['lat' => $lat,
+											'lng' => $lng,
+											'expired_delta' =>  $app['app.config']['pokemon_finder']['expired_delta'],
+											'kilometers' => $app['app.config']['generator']['min_distance_for_prevent_new_generate']
+		]);
+
+		if ($count<= GeneratorService::MIN_POKEMONS_FOR_NEW_GENERATE) {
+			$app['generator']->addGeneratorTask($lat, $lng);
+		}
+
+
 		$sql = "
 		SELECT pl.expired, pl.lat, pl.lng, p.name, p.pokeuid,
 		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
