@@ -11,9 +11,11 @@
     "min_minutes_for_show_near_user": 120
   },
   "generator": {
-    "get_near_location_range": 1000,
     "min_distance_for_prevent_new_generate": 0.5,
     "expired_sec_for_prevent_generate": 30
+  },
+  "pokemon_finder": {
+    "get_near_location_range": 2,
+    "expired_delta": 5
   }
-  
 }
