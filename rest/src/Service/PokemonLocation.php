@@ -31,9 +31,10 @@ class PokemonLocation
 		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
 		FROM pokemon_location AS pl
 		LEFT JOIN pokemon AS p ON pl.pokemon_id = p.id
-
+		WHERE pl.expired >= NOW() - INTERVAL 2 MINUTE
 		GROUP BY pokemon_id, lat, lng
-
+		HAVING distance < :kilometers
+		ORDER BY distance
 		";
 
 		$poks = $app['db']->fetchAll($sql, ['lat' => $lat,
@@ -51,7 +52,7 @@ class PokemonLocation
 			$pokeResponse = new PokemonResponse();
 			$pokeResponse->lng = (float)$pok["lng"];
 			$pokeResponse->lat = (float)$pok["lat"];
-			$pokeResponse->expired = (new \DateTime($pok["expired"]))->format('c');
+			$pokeResponse->expired = $pok["expired"];
 			$pokeResponse->pokeName = $pok["name"];
 			$pokeResponse->pokeUid = (int)$pok["pokeuid"];
 			$pokeResponse->distance = (float)$pok["distance"];
