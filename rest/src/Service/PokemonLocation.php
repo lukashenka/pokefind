@@ -69,10 +69,13 @@ class PokemonLocation
 		SELECT pl.expired, pl.lat, pl.lng, p.name, p.pokeuid
 		FROM pokemon_location AS pl
 		LEFT JOIN pokemon AS p ON pl.pokemon_id = p.id
+		WHERE pl.expired >= NOW() - INTERVAL :expired_delta MINUTE
 		GROUP BY pokemon_id, lat, lng
 		";
-		$poks = $app['db']->fetchAll($sql);
 
+		$poks = $app['db']->fetchAll($sql, [
+											'expired_delta' =>  $app['app.config']['pokemon_finder']['expired_delta']
+		]);
 		$pokList = [];
 		foreach ($poks as $pok) {
 			$pokeResponse = new PokemonResponse();
