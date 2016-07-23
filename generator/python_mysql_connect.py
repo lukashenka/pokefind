@@ -124,7 +124,7 @@ def get_task():
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
 
-        query = "SELECT id, lat, lng FROM location_for_update GROUP BY user_session_id WHERE blocked = 0 ORDER BY created ASC"
+        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 GROUP BY user_session_id  ORDER BY created ASC"
 
         cursor.execute(query)
         row = cursor.fetchone()
