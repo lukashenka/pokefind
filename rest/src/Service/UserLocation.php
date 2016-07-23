@@ -40,7 +40,7 @@ class UserLocation
 		$minute = $app['app.config']['user']['min_minutes_for_show_near_user'];
 
 		$sql = "
-		SELECT t.updated, t.lat, t.lng, u.guid,
+		SELECT u.updated, t.lat, t.lng, u.guid,
 		(6371 * acos(cos(radians(:lat)) * cos(radians(t.lat)) * cos(radians(t.lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(t.lat)))) AS distance
 		FROM user_session_track AS t
 		LEFT JOIN user_sessions as u ON u.id = t.user_session_id
