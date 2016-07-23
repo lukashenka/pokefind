@@ -40,6 +40,7 @@ $app->get('/user/getNear/{lat}/{lng}', function ($lat, $lng) use ($app) {
 
 	$service = $app['userService'];
 	$users = $service->getUserNear($lat, $lng);
+
 	return new Response(\GuzzleHttp\json_encode((array) $users), 200);
 });
 

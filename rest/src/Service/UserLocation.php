@@ -41,12 +41,12 @@ class UserLocation
 
 		$sql = "
 		SELECT t.updated, t.lat, t.lng, u.guid,
-		(6371 * acos(cos(radians(:lat)) * cos(radians(lat)) * cos(radians(lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(lat)))) AS distance
+		(6371 * acos(cos(radians(:lat)) * cos(radians(t.lat)) * cos(radians(t.lng) - radians(:lng)) + sin( radians(:lat)) * sin(radians(t.lat)))) AS distance
 		FROM user_session_track AS t
 		LEFT JOIN user_sessions as u ON u.id = t.user_session_id
-
+		LEFT JOIN user_session_track as t2 ON t2.user_session_id = t.user_session_id
 		WHERE t.updated > NOW() - INTERVAL :minute MINUTE
-
+		AND t.id > t2.id
 		GROUP BY t.user_session_id
 		HAVING distance < :kilometers
 		ORDER BY distance
@@ -68,6 +68,7 @@ class UserLocation
 			$userResponse->updated = $user["updated"];
 			array_push($userList, $userResponse);
 		}
+
 		return $userList;
 
 
