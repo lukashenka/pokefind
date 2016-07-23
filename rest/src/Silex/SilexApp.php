@@ -50,7 +50,32 @@ class SilexApp
 		$app['debug'] = true;
 
 		$app['project_root'] = realpath(__DIR__ . "/../../");
-		$app["app.config"] = \GuzzleHttp\json_decode(file_get_contents($app['project_root']."/config/config.json"), true);
+		$config = $app['project_root']."/config/config.json";
+		$app["app.config"] = \GuzzleHttp\json_decode('
+
+		{
+  "db": {
+    "dbuser": "root",
+    "dbpass": "root",
+    "dbname": "pgl",
+    "host": "localhost"
+  },
+  "user": {
+    "exp_min": "60",
+    "min_distance_for_show_near_user": 10,
+    "min_minutes_for_show_near_user": 120
+  },
+  "generator": {
+    "min_distance_for_prevent_new_generate": 0.5,
+    "expired_sec_for_prevent_generate": 30
+  },
+  "pokemon_finder": {
+    "get_near_location_range": 2,
+    "expired_delta": 5
+  }
+}
+
+		', true);
 
 
 		$app['log_folder'] = $app['project_root'] . "/log/";
