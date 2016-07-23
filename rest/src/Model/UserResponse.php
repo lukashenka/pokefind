@@ -12,7 +12,7 @@ namespace Rest\Model;
 class UserResponse
 {
 	public $lat;
-	public $userGUID;
+	public $guid;
 	public $lng;
 	public $updated;
 
