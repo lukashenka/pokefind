@@ -47,7 +47,7 @@ class UserLocation
 		LEFT JOIN user_session_track as t2 ON t2.user_session_id = t.user_session_id
 		WHERE t.updated > NOW() - INTERVAL :minute MINUTE
 		AND t.id > t2.id
-		GROUP BY t.user_session_id
+		GROUP BY u.guid
 		HAVING distance < :kilometers
 		ORDER BY distance
 		";
