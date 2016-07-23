@@ -66,6 +66,7 @@ class UserLocation
 			$userResponse->lng = (float)$user["lng"];
 			$userResponse->lat = (float)$user["lat"];
 			$userResponse->updated = $user["updated"];
+			$userResponse->distance = $user["distance"];
 			array_push($userList, $userResponse);
 		}
 

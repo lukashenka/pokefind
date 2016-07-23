@@ -15,5 +15,6 @@ class UserResponse
 	public $guid;
 	public $lng;
 	public $updated;
+	public $distance;
 
 }
