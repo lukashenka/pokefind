@@ -29,6 +29,17 @@ if __name__ == '__main__':
 
 
 def get_pokemon(pokename, pokeuid):
+    pokename = pokename.encode('UTF-8')
+
+    nidoran_f = u'Nidoran\u2640'.encode('UTF-8')
+    nidoran_m = u'Nidoran\u2642'.encode('UTF-8')  
+
+    if pokename.find(nidoran_f) >= 0:
+        pokename = 'Nidoran-F'
+
+    if pokename.find(nidoran_m) >= 0:
+        pokename = 'Nidoran-M'
+
     try:
         dbconfig = read_db_config()
         conn = MySQLConnection(**dbconfig)
@@ -59,6 +70,8 @@ def insert_pokemon(pokename, pokeuid):
             "VALUES(%s, %s, NOW())"
     args = (pokename, pokeuid)
 
+
+
     try:
         db_config = read_db_config()
         conn = MySQLConnection(**db_config)
@@ -77,18 +90,22 @@ def insert_pokemon(pokename, pokeuid):
         conn.close()
 
 
-def insert_pokelocation(pokId, lng, lat, expired):
-    query = "INSERT INTO pokemon_location(`pokemon_id`, `lng`, `lat`, expired, created) " \
-            "VALUES(%s, %s, %s, FROM_UNIXTIME(%s), NOW())"
+def insert_pokelocation(pokemon_list):    
+    if len(pokemon_list) == 0:
+        return
 
-    args = (pokId, lng, lat, expired)
+    values = ', '.join(["(%s, %s, %s, FROM_UNIXTIME(%s), NOW())" % (id, lng, lat, expired) 
+        for id, lng, lat, expired in pokemon_list])
+
+    query = "INSERT INTO pokemon_location(`pokemon_id`, `lng`, `lat`, expired, created) " \
+            "VALUES " + values
 
     try:
         db_config = read_db_config()
         conn = MySQLConnection(**db_config)
 
         cursor = conn.cursor()
-        cursor.execute(query, args)
+        cursor.execute(query)
 
         conn.commit()
         return cursor.lastrowid
@@ -107,7 +124,7 @@ def get_task():
         conn = MySQLConnection(**dbconfig)
         cursor = conn.cursor()
 
-        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 GROUP BY user_session_id ORDER BY created ASC"
+        query = "SELECT id, lat, lng FROM location_for_update WHERE blocked = 0 ORDER BY created ASC"
 
         cursor.execute(query)
         row = cursor.fetchone()

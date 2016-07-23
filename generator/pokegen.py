@@ -31,6 +31,7 @@ from requests.models import InvalidURL
 from transform import *
 
 from python_mysql_connect import *
+from coords import *
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
@@ -594,50 +595,44 @@ def main():
         elif args.only:
             only = [i.lower().strip() for i in args.only.split(',')]
 
+        coords = get_coords(origin_lat, origin_lon, 500, 1)
+        
         pos = 1
-        x = 0
-        y = 0
-        dx = 0
-        dy = -1
-        steplimit2 = steplimit ** 2
-        for step in range(steplimit2):
-            # starting at 0 index
-            debug('looping: step {} of {}'.format((step + 1), steplimit ** 2))
-            # debug('steplimit: {} x: {} y: {} pos: {} dx: {} dy {}'.format(steplimit2, x, y, pos, dx, dy))
-            # Scan location math
-            if -steplimit2 / 2 < x <= steplimit2 / 2 and -steplimit2 / 2 < y <= steplimit2 / 2:
-                set_location_coords(x * 0.0025 + origin_lat, y * 0.0025 + origin_lon, 0)
-            if x == y or x < 0 and x == -y or x > 0 and x == 1 - y:
-                (dx, dy) = (-dy, dx)
+        steps = len(coords)
 
-            (x, y) = (x + dx, y + dy)
+        print('Steps count: ' + str(steps))
 
-            process_step(args, api_endpoint, access_token, profile_response,
+        #f = open('coords.txt', 'w')
+        #for item in coords:
+            #f.write(str(item[0]) + ',' + str(item[1]) + '\n')
+        #f.close()      
+
+        for s_coord in coords:
+            lat = s_coord[0]
+            lon = s_coord[1]
+
+            debug('looping: step {} of {}'.format((pos), steps))
+
+            set_location_coords(lat, lon, 0)
+
+            pokemons_list = process_step(args, api_endpoint, access_token, profile_response,
                          pokemonsJSON, ignore, only)
+            insert_pokelocation(pokemons_list)
 
+            set_step(generateLogId, steps, pos)
+            print('Completed: ' + str(float(pos) / float(steps) * 100) + '%')
 
-            set_step(generateLogId, steplimit2, step +1)
-            print('Completed: ' + str(
-                ((step + 1) + pos * .25 - .25) / (steplimit2) * 100) + '%')
-
-        global NEXT_LAT, NEXT_LONG
-        if (NEXT_LAT and NEXT_LONG and
-                (NEXT_LAT != FLOAT_LAT or NEXT_LONG != FLOAT_LONG)):
-            print('Update to next location %f, %f' % (NEXT_LAT, NEXT_LONG))
-            set_location_coords(NEXT_LAT, NEXT_LONG, 0)
-            NEXT_LAT = 0
-            NEXT_LONG = 0
-        else:
-            set_location_coords(origin_lat, origin_lon, 0)
+            pos += 1
 
         set_step_status(generateLogId, 1, 0)
-
+        
     except Error as error:
         print(error)
 
 def process_step(args, api_endpoint, access_token, profile_response,
                  pokemonsJSON, ignore, only):
     print('[+] Searching for Pokemon at location {} {}'.format(FLOAT_LAT, FLOAT_LONG))
+    pokemons_list = []
     origin = LatLng.from_degrees(FLOAT_LAT, FLOAT_LONG)
     step_lat = FLOAT_LAT
     step_long = FLOAT_LONG
@@ -715,7 +710,8 @@ def process_step(args, api_endpoint, access_token, profile_response,
 
         }
         id = get_pokemon(pokename, poke.pokemon.PokemonId)
-        insert_pokelocation(id, poke.Longitude, poke.Latitude, disappear_timestamp)
+        pokemons_list.append((id, poke.Longitude, poke.Latitude, disappear_timestamp))
+    return pokemons_list
 
 if __name__ == '__main__':
     args = get_args()
