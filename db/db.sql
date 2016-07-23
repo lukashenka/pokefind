@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `generation_log` (
     `steps` int(11) NOT NULL DEFAULT '0',
     `current_step` int(11) NOT NULL DEFAULT '0',
     `done` int(11) NOT NULL DEFAULT '0',
-    `fail` int(11) DEFAULT  NOT NULL DEFAULT '0',
+    `fail` int(11) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
     KEY `generation_log_update_location_id_done_index` (`update_location_id`,`done`),
     KEY `done` (`done`)
