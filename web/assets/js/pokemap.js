@@ -7,7 +7,7 @@ var Pokemap = {
     pokeMarkers: [],
     pokeWindowMarkers: [],
     refreshLocationTimer: null,
-    refreshLocationTimerInterval: 10000,
+    refreshLocationTimerInterval: 20000,
 
 
     getUID: function () {
@@ -38,6 +38,7 @@ var Pokemap = {
 
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getCenterControl());
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getPokemonsControl());
+        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getInfoText());
 
         Pokemap.getCurLocation(function (pos) {
             Pokemap.setCurLocationMarker(pos);
@@ -119,7 +120,40 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img id="eshImage" src="assets/esh.png" style="width: 50px; height: 50px"/>';
+        controlText.innerHTML = '<div class="btn btn-default">  <img id="eshImage" src="assets/esh.png" style="width: 50px; height: 50px"/> Центрировать</div>';
+        controlUI.appendChild(controlText);
+
+
+        controlUI.addEventListener('click', function () {
+            Pokemap.getCurLocation(function (pos) {
+                Pokemap.setCurLocationMarker(pos);
+                Pokemap.getMap().setCenter(pos);
+                Pokemap.getMap().setZoom(18);
+            });
+
+        });
+        return controlDiv;
+    },
+
+    getInfoText: function () {
+        // Create a div to hold the control.
+        var controlDiv = document.createElement('div');
+
+        var controlUI = document.createElement('div');
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.textAlign = 'center';
+        controlUI.title = 'Click to refresh the map';
+        controlDiv.appendChild(controlUI);
+
+        var controlText = document.createElement('div');
+        controlText.style.color = 'rgb(25,25,25)';
+        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+        controlText.style.fontSize = '16px';
+        controlText.style.lineHeight = '38px';
+        controlText.style.paddingLeft = '5px';
+        controlText.style.paddingRight = '5px';
+        controlText.innerHTML = '<div class="alert alert-warning">Демо версия карты, после обновление если покемоны не нашлись, попробуйте переобновить через 20 сек пока бот обработает область.</div>';
         controlUI.appendChild(controlText);
 
 
@@ -153,7 +187,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img id="pokeballImage" src="assets/pokeball.png" style="width: 50px; height: 50px"/>';
+        controlText.innerHTML = '<div class="btn btn-default"><img id="pokeballImage" src="assets/pokeball.png" style="width: 50px; height: 50px"/>Обновить</div>';
         controlUI.appendChild(controlText);
 
 
