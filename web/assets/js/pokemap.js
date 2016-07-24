@@ -10,6 +10,13 @@ var Pokemap = {
     refreshLocationTimerInterval: 10000,
 
 
+    getUID: function () {
+        if (!$.cookie("uid")) {
+            var uid = "web" + (new Date()).getTime();
+            $.cookie("uid", uid);
+        }
+    },
+
     getMap: function () {
         return this.map;
     },
@@ -180,7 +187,7 @@ var Pokemap = {
             url: "../rest/pokemon/list/" + pos.lat + "/" + pos.lng,
             type: 'GET',
             dataType: 'json',
-            headers: {'Userguid': 'some value'},
+            headers: {'Userguid': Pokemap.getUID()},
             success: function (json) {
                 $.each(json, function (key, data) {
 
