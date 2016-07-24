@@ -7,7 +7,7 @@ var Pokemap = {
     pokeMarkers: [],
     pokeWindowMarkers: [],
     refreshLocationTimer: null,
-    refreshLocationTimerInterval: 20000,
+    refreshLocationTimerInterval: 2000,
     updateDisable: false,
 
 
@@ -34,12 +34,15 @@ var Pokemap = {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
             center: this.defaultCoord,
-            zoom: this.defaultZoom
+            zoom: this.defaultZoom,
+            disableDefaultUI: true,
+            scaleControl: true,
+            zoomControl: true
         });
 
-        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getCenterControl());
-        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getPokemonsControl());
-        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getInfoText());
+        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getCenterControl());
+        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getPokemonsControl());
+        this.map.controls[google.maps.ControlPosition.BOTTOM_CENTER].push(this.getInfoText());
 
         Pokemap.getCurLocation(function (pos) {
             Pokemap.setCurLocationMarker(pos);
@@ -74,7 +77,6 @@ var Pokemap = {
     refreshLocation: function () {
         this.getCurLocation(function (pos) {
             Pokemap.setCurLocationMarker(pos);
-            Pokemap.getPokemons(pos);
             console.log("Location refreshed");
         });
     },
@@ -110,6 +112,7 @@ var Pokemap = {
         var controlUI = document.createElement('div');
         controlUI.style.cursor = 'pointer';
         controlUI.style.textAlign = 'center';
+        controlUI.style.marginBottom = '30px';
         controlUI.title = 'Click to recenter the map';
         controlDiv.appendChild(controlUI);
 
@@ -166,6 +169,7 @@ var Pokemap = {
         var controlUI = document.createElement('div');
         controlUI.style.cursor = 'pointer';
         controlUI.style.textAlign = 'center';
+        controlUI.style.marginBottom = '30px';
         controlUI.title = 'Click to recenter the map';
         controlUI.id = "getPokemonsControl";
         controlDiv.appendChild(controlUI);
