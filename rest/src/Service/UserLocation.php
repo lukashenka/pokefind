@@ -65,7 +65,7 @@ class UserLocation
 			$userResponse->guid = $user["guid"];
 			$userResponse->lng = (float)$user["lng"];
 			$userResponse->lat = (float)$user["lat"];
-			$date = new \DateTime($user["expired"]);
+			$date = new \DateTime($user["updated"]);
 			$userResponse->updated = $date->format('c');
 			$userResponse->distance = $user["distance"];
 			array_push($userList, $userResponse);
