@@ -20,6 +20,9 @@ class UserProvider
 
 		$user = new UserSession();
 		$userGuid = $request->headers->get('Userguid');
+		if (!$userGuid) {
+			throw new AccessDeniedException('Go away!');
+		}
 		$ip = $request->getClientIp();
 		$user->userGUID = $userGuid;
 		$user->ip = $ip;
@@ -27,9 +30,7 @@ class UserProvider
 		$this->userSession = $user;
 		$this->setUserSession();
 
-		if (!$userGuid) {
-			throw new AccessDeniedException('Go away!');
-		}
+
 
 	}
 

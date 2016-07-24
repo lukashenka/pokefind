@@ -9,8 +9,12 @@ $app = \Rest\Silex\SilexApp::getApp();
 
 $app->before(function (Request $request) use ($app) {
 
-	$app['userProvider']->init($request);
-
+	try {
+		$app['userProvider']->init($request);
+	}
+	catch(\Symfony\Component\Security\Core\Exception\AccessDeniedException $e) {
+		return new Response($e->getMessage(), 401);
+	}
 });
 
 $app->get('/hello', function () use ($app) {
