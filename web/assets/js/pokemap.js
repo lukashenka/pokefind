@@ -8,6 +8,7 @@ var Pokemap = {
     pokeWindowMarkers: [],
     refreshLocationTimer: null,
     refreshLocationTimerInterval: 20000,
+    updateDisable: false,
 
 
     getUID: function () {
@@ -166,19 +167,22 @@ var Pokemap = {
         controlUI.style.cursor = 'pointer';
         controlUI.style.textAlign = 'center';
         controlUI.title = 'Click to recenter the map';
+        controlUI.id = "getPokemonsControl";
         controlDiv.appendChild(controlUI);
 
         var controlText = document.createElement('div');
         controlText.style.color = 'rgb(25,25,25)';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<div class="btn btn-default btn-sm"><img id="pokeballImage" src="assets/pokeball.png" style="width: 50px; height: 50px"/>Обновить</div>';
+        controlText.innerHTML = '<div class="btn btn-default btn-sm"><img id="pokeballImage" src="assets/pokeball.png" style="width: 50px; height: 50px"/>Обновить</div >';
         controlUI.appendChild(controlText);
 
 
         controlUI.addEventListener('click', function () {
             Pokemap.getCurLocation(function (pos) {
-                Pokemap.getPokemons(pos)
+                if(!Pokemap.updateDisable) {
+                    Pokemap.getPokemons(pos)
+                }
             });
 
         });
@@ -201,6 +205,7 @@ var Pokemap = {
 
         this.clearPokeMarkers();
         this.animate(jQuery("#pokeballImage"));
+        Pokemap.updateDisable = true;
 
         $.ajax({
             url: "../rest/pokemon/list/" + pos.lat + "/" + pos.lng,
@@ -238,6 +243,8 @@ var Pokemap = {
                     Pokemap.pokeMarkers.push(marker);
                     Pokemap.pokeWindowMarkers.push(infowindow);
                 });
+
+                Pokemap.updateDisable = false;
             }
         });
     },
