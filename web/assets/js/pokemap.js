@@ -38,11 +38,11 @@ var Pokemap = {
                 Pokemap.setCurLocationMarker(pos);
                 Pokemap.getMap().setCenter(pos);
             }, function () {
-                handleLocationError(true, infoWindow, map.getCenter());
+                alert("Ошибка определения геолокации")
             });
         } else {
             // Browser doesn't support Geolocation
-            handleLocationError(false, infoWindow, map.getCenter());
+            alert("Ошибка определения геолокации. Браузер не поддерживает геолокацию")
         }
     },
 
