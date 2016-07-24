@@ -41,7 +41,7 @@ var Pokemap = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-                console.log('Finded position:' + pos.lat + "/" + pos.lng);
+                console.log('Found position:' + pos.lat + "/" + pos.lng);
                 callback(pos);
             }, function () {
                 alert("Ошибка определения геолокации")
@@ -53,7 +53,7 @@ var Pokemap = {
     },
 
     refreshLocation: function () {
-        this.getCurLocation(function(pos) {
+        this.getCurLocation(function (pos) {
             Pokemap.setCurLocationMarker(pos);
             console.log("Location refreshed");
         });
@@ -61,6 +61,9 @@ var Pokemap = {
 
     'setCurLocationMarker': function (coords) {
 
+        if (this.getCurMarker()) {
+            this.getCurMarker().setMap(null);
+        }
         console.log("Cur location marker: " + coords);
         var icon = {
             url: 'assets/esh.png',
@@ -84,8 +87,6 @@ var Pokemap = {
         var controlDiv = document.createElement('div');
 
         var controlUI = document.createElement('div');
-        controlUI.style.backgroundColor = '#fff';
-        controlUI.style.border = '2px solid #fff';
         controlUI.style.cursor = 'pointer';
         controlUI.style.marginBottom = '22px';
         controlUI.style.textAlign = 'center';
@@ -99,14 +100,15 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = 'Center Map';
+        controlText.innerHTML = '<img src="assets/esh.png"/>';
         controlUI.appendChild(controlText);
 
 
         controlUI.addEventListener('click', function () {
-            Pokemap.getCurLocation(function(pos){
+            Pokemap.getCurLocation(function (pos) {
                 Pokemap.setCurLocationMarker(pos);
                 Pokemap.getMap().setCenter(pos);
+                Pokemap.getMap().setZoom(15);
             });
 
         });
