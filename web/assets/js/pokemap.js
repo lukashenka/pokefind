@@ -4,6 +4,7 @@ var Pokemap = {
     defaultZoom: 7,
     map: null,
     curLocationMarker: null,
+    pokeMarkers: null,
     refreshLocationTimer: null,
     refreshLocationTimerInterval: 10000,
 
@@ -27,6 +28,7 @@ var Pokemap = {
         });
 
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getCenterControl());
+        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getPokemonsControl());
 
         Pokemap.refreshLocation();
         this.refreshLocationTimer = setInterval(function () {
@@ -100,7 +102,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img src="assets/esh.png" style="width: 50%"/> <div style="padding: 2px; background: white">Центрировать</div> ';
+        controlText.innerHTML = '<img src="assets/esh.png" style="width: 50px; height: 50px"/>';
         controlUI.appendChild(controlText);
 
 
@@ -115,12 +117,53 @@ var Pokemap = {
         return controlDiv;
     },
 
-    'getPokemons': function (lat, lng) {
+
+    getPokemonsControl: function () {
+        // Create a div to hold the control.
+        var controlDiv = document.createElement('div');
+
+        var controlUI = document.createElement('div');
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.textAlign = 'center';
+        controlUI.title = 'Click to recenter the map';
+        controlDiv.appendChild(controlUI);
+
+        var controlText = document.createElement('div');
+        controlText.style.color = 'rgb(25,25,25)';
+        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+        controlText.style.fontSize = '16px';
+        controlText.style.lineHeight = '38px';
+        controlText.style.paddingLeft = '5px';
+        controlText.style.paddingRight = '5px';
+        controlText.innerHTML = '<img src="assets/pokeball.png" style="width: 50px; height: 50px"/>';
+        controlUI.appendChild(controlText);
+
+
+        controlUI.addEventListener('click', function () {
+            Pokemap.getCurLocation(function (pos) {
+                Pokemap.getPokemons(pos)
+            });
+
+        });
+        return controlDiv;
+    },
+
+    clearPokeMarkers: function () {
+        $.each(Pokemap.pokeMarkers, function (key, pokeMarker) {
+                pokeMarker.setMap(null);
+            }
+        );
+    },
+
+    getPokemons: function (pos) {
+
+
         $.ajax({
-            url: "../rest/pokemon/list/" + lat + "/" + lng,
+            url: "/pgoweb/rest/pokemon/list/" + pos.lat + "/" + pos.lng,
             type: 'GET',
             dataType: 'json',
-            beforeSend: setHeader,
+            headers: { 'Useruuid': 'some value' },
             success: function (json) {
                 $.each(json, function (key, data) {
 
@@ -130,8 +173,6 @@ var Pokemap = {
                         'Истекает:  ' + data.expired + '<br>'
 
                     });
-
-
                     var latLng = new google.maps.LatLng(data.lat, data.lng);
                     // Creating a marker and putting it on the map
                     var image = "assets/larger-icons/" + data.pokeuid + ".png";
@@ -142,10 +183,12 @@ var Pokemap = {
                         title: data.name
 
                     });
-                    marker.setMap(map);
+                    marker.setMap(Pokemap.getMap());
                     marker.addListener('click', function () {
-                        infowindow.open(map, marker);
+                        infowindow.open(Pokemap.getMap(), marker);
                     });
+
+                    Pokemap.pokeMarkers.push(marker);
                 });
             }
         });
