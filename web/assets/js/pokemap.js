@@ -12,9 +12,10 @@ var Pokemap = {
 
     getUID: function () {
         if (!$.cookie("uid")) {
-            var uid = "web" + (new Date()).getTime();
+            var uid = "pokeweb" + (new Date()).getTime();
             $.cookie("uid", uid);
         }
+        return $.cookie("uid");
     },
 
     getMap: function () {
@@ -85,17 +86,16 @@ var Pokemap = {
         }
         console.log("Cur location marker: " + coords);
         var icon = {
-            url: 'assets/esh.png',
+            url: 'assets/nav.png',
             //state your size parameters in terms of pixels
-            size: new google.maps.Size(50, 50),
-            scaledSize: new google.maps.Size(50, 50),
+            size: new google.maps.Size(25, 25),
+            scaledSize: new google.maps.Size(25, 25),
             origin: new google.maps.Point(0, 0)
         };
 
         var marker = new google.maps.Marker({
             position: coords,
             map: Pokemap.getMap(),
-            icon: icon,
             title: "Настоящий Мастер покемонов"
         });
         this.setCurMarker(marker);
@@ -119,7 +119,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img id="eshImage" src="assets/esh.png" style="width: 10px; height: 10px"/>';
+        controlText.innerHTML = '<img id="eshImage" src="assets/esh.png" style="width: 50px; height: 50px"/>';
         controlUI.appendChild(controlText);
 
 

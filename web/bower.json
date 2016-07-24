@@ -17,6 +17,7 @@
   "dependencies": {
     "angular-google-maps": "^2.3.3",
     "angular": "^1.5.8",
-    "bootstrap": "^3.3.6"
+    "bootstrap": "^3.3.6",
+    "jquery-cookie": "*"
   }
 }
