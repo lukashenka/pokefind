@@ -36,8 +36,7 @@ var Pokemap = {
             center: this.defaultCoord,
             zoom: this.defaultZoom,
             disableDefaultUI: true,
-            scaleControl: true,
-            zoomControl: true
+
         });
 
         this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getCenterControl());
