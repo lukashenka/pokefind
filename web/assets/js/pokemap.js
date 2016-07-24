@@ -7,7 +7,7 @@ var Pokemap = {
     pokeMarkers: [],
     pokeWindowMarkers: [],
     refreshLocationTimer: null,
-    refreshLocationTimerInterval: 2000,
+    refreshLocationTimerInterval: 5000,
     updateDisable: false,
 
 
