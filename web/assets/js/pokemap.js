@@ -1,7 +1,7 @@
 var Pokemap = {
 
-    defaultCoord: {lat: -34.397, lng: 150.644},
-    defaultZoom: 15,
+    defaultCoord: {lat: 53, lng: 27},
+    defaultZoom: 7,
     map: null,
     curLocationMarker: null,
     refreshLocationTimer: null,
@@ -15,7 +15,7 @@ var Pokemap = {
     getCurMarker: function () {
         return this.curLocationMarker;
     },
-    setCurMarket: function (marker) {
+    setCurMarker: function (marker) {
         this.curLocationMarker = marker;
     },
 
@@ -23,24 +23,26 @@ var Pokemap = {
 
         this.map = new google.maps.Map(document.getElementById('map'), {
             center: this.defaultCoord,
-            zoom: 15
+            zoom: this.defaultZoom
         });
 
+        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getCenterControl());
+
+        Pokemap.refreshLocation();
         this.refreshLocationTimer = setInterval(function () {
-            this.refreshLocation();
+            Pokemap.refreshLocation();
         }, this.refreshLocationTimerInterval)
     },
 
-    refreshLocation: function () {
+    getCurLocation: function (callback) {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 var pos = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-
-                Pokemap.setCurLocationMarker(pos);
-                Pokemap.getMap().setCenter(pos);
+                console.log('Finded position:' + pos.lat + "/" + pos.lng);
+                callback(pos);
             }, function () {
                 alert("Ошибка определения геолокации")
             });
@@ -50,8 +52,16 @@ var Pokemap = {
         }
     },
 
+    refreshLocation: function () {
+        this.getCurLocation(function(pos) {
+            Pokemap.setCurLocationMarker(pos);
+            console.log("Location refreshed");
+        });
+    },
+
     'setCurLocationMarker': function (coords) {
 
+        console.log("Cur location marker: " + coords);
         var icon = {
             url: 'assets/esh.png',
             //state your size parameters in terms of pixels
@@ -66,7 +76,41 @@ var Pokemap = {
             icon: icon,
             title: "Настоящий Мастер покемонов"
         });
-        this.setCurMarket(marker);
+        this.setCurMarker(marker);
+    },
+
+    getCenterControl: function () {
+        // Create a div to hold the control.
+        var controlDiv = document.createElement('div');
+
+        var controlUI = document.createElement('div');
+        controlUI.style.backgroundColor = '#fff';
+        controlUI.style.border = '2px solid #fff';
+        controlUI.style.cursor = 'pointer';
+        controlUI.style.marginBottom = '22px';
+        controlUI.style.textAlign = 'center';
+        controlUI.title = 'Click to recenter the map';
+        controlDiv.appendChild(controlUI);
+
+        var controlText = document.createElement('div');
+        controlText.style.color = 'rgb(25,25,25)';
+        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+        controlText.style.fontSize = '16px';
+        controlText.style.lineHeight = '38px';
+        controlText.style.paddingLeft = '5px';
+        controlText.style.paddingRight = '5px';
+        controlText.innerHTML = 'Center Map';
+        controlUI.appendChild(controlText);
+
+
+        controlUI.addEventListener('click', function () {
+            Pokemap.getCurLocation(function(pos){
+                Pokemap.setCurLocationMarker(pos);
+                Pokemap.getMap().setCenter(pos);
+            });
+
+        });
+        return controlDiv;
     },
 
     'getPokemons': function (lat, lng) {
