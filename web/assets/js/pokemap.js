@@ -79,7 +79,7 @@ var Pokemap = {
 
     'setCurLocationMarker': function (coords) {
 
-        this.animate($("#eshImage"));
+        this.animate(jQuery("#eshImage"));
 
         if (this.getCurMarker()) {
             this.getCurMarker().setMap(null);
@@ -181,7 +181,7 @@ var Pokemap = {
     getPokemons: function (pos) {
 
         this.clearPokeMarkers();
-        this.animate($("#pokeballImage"));
+        this.animate(jQuery("#pokeballImage"));
 
         $.ajax({
             url: "../rest/pokemon/list/" + pos.lat + "/" + pos.lng,
