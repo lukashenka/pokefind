@@ -38,7 +38,7 @@ var Pokemap = {
 
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getCenterControl());
         this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getPokemonsControl());
-        this.map.controls[google.maps.ControlPosition.BOTTOM_LEFT].push(this.getInfoText());
+        this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getInfoText());
 
         Pokemap.getCurLocation(function (pos) {
             Pokemap.setCurLocationMarker(pos);
@@ -153,7 +153,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<div class="alert alert-warning">Демо версия карты, после обновление если покемоны не нашлись, попробуйте переобновить через 20 сек пока бот обработает область.</div>';
+        controlText.innerHTML = '<div class="alert alert-warning">После обновления если покемоны не нашлись, попробуйте переобновить через 20 сек пока бот обработает область.</div>';
         controlUI.appendChild(controlText);
 
 
