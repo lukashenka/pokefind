@@ -4,6 +4,9 @@ var Pokemap = {
     defaultZoom: 15,
     map: null,
     curLocationMarker: null,
+    refreshLocationTimer: null,
+    refreshLocationTimerInterval: 10000,
+
 
     getMap: function () {
         return this.map;
@@ -23,8 +26,9 @@ var Pokemap = {
             zoom: 15
         });
 
-        this.refreshLocation();
-
+        this.refreshLocationTimer = setInterval(function () {
+            this.refreshLocation();
+        }, this.refreshLocationTimerInterval)
     },
 
     refreshLocation: function () {
@@ -53,8 +57,8 @@ var Pokemap = {
             //state your size parameters in terms of pixels
             size: new google.maps.Size(50, 50),
             scaledSize: new google.maps.Size(50, 50),
-            origin: new google.maps.Point(0,0)
-        }
+            origin: new google.maps.Point(0, 0)
+        };
 
         var marker = new google.maps.Marker({
             position: coords,
@@ -63,6 +67,42 @@ var Pokemap = {
             title: "Настоящий Мастер покемонов"
         });
         this.setCurMarket(marker);
+    },
+
+    'getPokemons': function (lat, lng) {
+        $.ajax({
+            url: "../rest/pokemon/list/" + lat + "/" + lng,
+            type: 'GET',
+            dataType: 'json',
+            beforeSend: setHeader,
+            success: function (json) {
+                $.each(json, function (key, data) {
+
+                    var infowindow = new google.maps.InfoWindow({
+                        content: '' +
+                        'Имя: ' + data.name + '<br>' +
+                        'Истекает:  ' + data.expired + '<br>'
+
+                    });
+
+
+                    var latLng = new google.maps.LatLng(data.lat, data.lng);
+                    // Creating a marker and putting it on the map
+                    var image = "assets/larger-icons/" + data.pokeuid + ".png";
+                    var marker = new google.maps.Marker({
+                        position: latLng,
+                        map: map,
+                        icon: image,
+                        title: data.name
+
+                    });
+                    marker.setMap(map);
+                    marker.addListener('click', function () {
+                        infowindow.open(map, marker);
+                    });
+                });
+            }
+        });
     }
 
 };
