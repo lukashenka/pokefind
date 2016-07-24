@@ -100,7 +100,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img src="assets/esh.png"/>';
+        controlText.innerHTML = '<img src="assets/esh.png"/> Центрировать';
         controlUI.appendChild(controlText);
 
 
