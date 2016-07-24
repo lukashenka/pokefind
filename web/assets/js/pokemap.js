@@ -108,18 +108,13 @@ var Pokemap = {
 
         var controlUI = document.createElement('div');
         controlUI.style.cursor = 'pointer';
-        controlUI.style.marginBottom = '22px';
         controlUI.style.textAlign = 'center';
         controlUI.title = 'Click to recenter the map';
         controlDiv.appendChild(controlUI);
 
         var controlText = document.createElement('div');
         controlText.style.color = 'rgb(25,25,25)';
-        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-        controlText.style.fontSize = '16px';
-        controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
-        controlText.style.paddingRight = '5px';
         controlText.innerHTML = '<div class="btn btn-default btn-sm">  <img id="eshImage" src="assets/esh.png" style="width: 50px; height: 50px"/> Центрировать</div>';
         controlUI.appendChild(controlText);
 
@@ -141,19 +136,13 @@ var Pokemap = {
 
         var controlUI = document.createElement('div');
         controlUI.style.cursor = 'pointer';
-        controlUI.style.marginBottom = '22px';
         controlUI.style.textAlign = 'center';
         controlUI.title = 'Click to refresh the map';
         controlDiv.appendChild(controlUI);
 
         var controlText = document.createElement('div');
         controlText.style.color = 'rgb(25,25,25)';
-        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-        controlText.style.fontSize = '16px';
-        controlText.style.lineHeight = '38px';
-        controlText.style.paddingLeft = '5px';
-        controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<div style="background: white; padding: 2px" ">После обновления если покемоны не нашлись, попробуйте переобновить через 20 сек пока бот обработает область.</div>';
+        controlText.innerHTML = '<div class="alert alert-warning" ">После обновления если покемоны не нашлись, попробуйте переобновить через 20 сек пока бот обработает область.</div>';
         controlUI.appendChild(controlText);
 
 
@@ -175,16 +164,12 @@ var Pokemap = {
 
         var controlUI = document.createElement('div');
         controlUI.style.cursor = 'pointer';
-        controlUI.style.marginBottom = '22px';
         controlUI.style.textAlign = 'center';
         controlUI.title = 'Click to recenter the map';
         controlDiv.appendChild(controlUI);
 
         var controlText = document.createElement('div');
         controlText.style.color = 'rgb(25,25,25)';
-        controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-        controlText.style.fontSize = '16px';
-        controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
         controlText.innerHTML = '<div class="btn btn-default btn-sm"><img id="pokeballImage" src="assets/pokeball.png" style="width: 50px; height: 50px"/>Обновить</div>';
