@@ -36,7 +36,6 @@ var Pokemap = {
             center: this.defaultCoord,
             zoom: this.defaultZoom,
             disableDefaultUI: true,
-
         });
 
         this.map.controls[google.maps.ControlPosition.TOP_CENTER].push(this.getCenterControl());
@@ -224,7 +223,7 @@ var Pokemap = {
                     var infowindow = new google.maps.InfoWindow({
                         content: '' +
                         'Имя: ' + data.name + '<br>' +
-                        'Истекает:  ' + date.getHours() + ':' + dateSeconds + '<br>' +
+                        'Истекает:  ' + date.getHours() + ':' + date.getMinutes() + '<br>' +
                         'Осталось:  ' + seconds + ' Cекунд <br>'
 
                     });
