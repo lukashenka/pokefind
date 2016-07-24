@@ -119,7 +119,7 @@ var Pokemap = {
         controlText.style.lineHeight = '38px';
         controlText.style.paddingLeft = '5px';
         controlText.style.paddingRight = '5px';
-        controlText.innerHTML = '<img id="eshImage" src="assets/esh.png" style="width: 50px; height: 50px"/>';
+        controlText.innerHTML = '<img id="eshImage" src="assets/esh.png" style="width: 10px; height: 10px"/>';
         controlUI.appendChild(controlText);
 
 
