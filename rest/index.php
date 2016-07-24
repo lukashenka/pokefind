@@ -38,6 +38,7 @@ $app->get('/user/loadProgress', function () use ($app) {
 
 $app->get('/user/getNear/{lat}/{lng}', function ($lat, $lng) use ($app) {
 
+	$app['userProvider']->track($lat, $lng);
 	$service = $app['userService'];
 	$users = $service->getUserNear($lat, $lng);
 
