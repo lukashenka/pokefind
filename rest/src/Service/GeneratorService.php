@@ -11,10 +11,9 @@ use Rest\Silex\SilexApp;
 
 class GeneratorService
 {
-	const MIN_POKEMONS_FOR_NEW_GENERATE = 20;
-
 	public function addGeneratorTask($lat, $lng)
 	{
+
 		$app = SilexApp::getApp();
 		$db = $app['db'];
 		$user = $app['userProvider']->getUserSession();
@@ -31,17 +30,33 @@ class GeneratorService
 		]);
 		if (count($nearJobs) == 0) {
 
-			$sql = "
+			$getNotBlockedUserLocationSql =
+				"SELECT id FROM location_for_update WHERE user_session_id = :user AND blocked = 0 LIMIT 1";
+			$alreadyJobbedId = (int)$db->fetchColumn($getNotBlockedUserLocationSql, ['user' => $app['userProvider']->getUserSession()->id]);
+			if ($alreadyJobbedId) {
+				$sql = "UPDATE  location_for_update  SET user_session_id = :user, lat = :lat, lng = :lng, created = NOW() WHERE id = :id";
+				$stmt = $db->prepare($sql);
+				$stmt->execute([
+					'user' => $app['userProvider']->getUserSession()->id,
+					'lat' => $lat,
+					'lng' => $lng,
+					'id' => $alreadyJobbedId
+				]);
+			} else {
+				$sql = "
 				INSERT INTO location_for_update(user_session_id, lat,lng,created)
 				VALUES (:user, :lat, :lng, NOW())
 			";
 
-			$stmt = $db->prepare($sql);
-			$stmt->execute([
-				'user' => $app['userProvider']->getUserSession()->id,
-				'lat' => $lat,
-				'lng' => $lng
-			]);
+				$stmt = $db->prepare($sql);
+				$stmt->execute([
+					'user' => $app['userProvider']->getUserSession()->id,
+					'lat' => $lat,
+					'lng' => $lng
+				]);
+			}
+
+
 		}
 	}
 }

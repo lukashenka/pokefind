@@ -47,11 +47,11 @@ class SilexApp
 	{
 		$app = new Application();
 
-		$app['debug'] = false;
+
 
 		$app['project_root'] = realpath(__DIR__ . "/../../");
 		$app["app.config"] = \GuzzleHttp\json_decode(file_get_contents($app['project_root']."/config/config.json"), true);
-
+		$app['debug'] = $app['app.config']['debug'];
 
 		$app['log_folder'] = $app['project_root'] . "/log/";
 

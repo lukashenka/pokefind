@@ -38,11 +38,10 @@ class UserProvider
 	{
 		$app = SilexApp::getApp();
 		$db = $app['db'];
-		$sql = "SELECT id FROM user_sessions WHERE guid = :guid AND updated >= NOW() - INTERVAL :minute MINUTE LIMIT 1";
+		$sql = "SELECT id FROM user_sessions WHERE guid = :guid";
 
 		$user = $db->fetchColumn($sql, [
-			'guid' => $this->userSession->userGUID,
-			"minute" => $app['app.config']['user']['exp_min']
+			'guid' => $this->userSession->userGUID
 		]);
 		if ($user) {
 			$this->userSession->id = (int)$user;
