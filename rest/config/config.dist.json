@@ -11,7 +11,8 @@
   },
   "generator": {
     "min_distance_for_prevent_new_generate": 0.5,
-    "expired_sec_for_prevent_generate": 30
+    "expired_sec_for_prevent_generate": 30,
+    "min_poks_for_new_generate": 20
   },
   "pokemon_finder": {
     "get_near_location_range": 2,
