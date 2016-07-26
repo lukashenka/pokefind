@@ -28,7 +28,23 @@ class GeneratorService
 			'distance' => $app['app.config']['generator']['min_distance_for_prevent_new_generate'],
 			'expired_sec' => $app['app.config']['generator']['expired_sec_for_prevent_generate']
 		]);
-		if (count($nearJobs) == 0) {
+
+		$isLastCurUserJobNotExpired = (bool)(int)
+		$db->fetchColumn(
+			"SELECT id
+                     FROM location_for_update
+                     WHERE created >= NOW() - INTERVAL :expired_user_sec SECOND
+                     AND blocked = 1
+                     AND user_session_id = :user
+                     LIMIT 1
+				 	",
+			[
+				"expired_user_sec" => $app['app.config']['generator']['expired_sec_for_prevent_generate_for_user'],
+				'user' => $app['userProvider']->getUserSession()->id,
+			]
+		);
+
+		if ((count($nearJobs) == 0) && !$isLastCurUserJobNotExpired) {
 
 			$getNotBlockedUserLocationSql =
 				"SELECT id FROM location_for_update WHERE user_session_id = :user AND blocked = 0 LIMIT 1";
